@@ -161,7 +161,7 @@ class AuthViewSet(viewsets.ViewSet):
     def forget_password(self, request):
         data = request.data
         check_otp = OTP.objects.filter(email=data['email'], otp=data['otp'])
-        if check_otp:
+        if check_otp.exists():
             try:
                 user = User.objects.get(email=data['email'])
             except Exception:
