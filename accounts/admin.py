@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import User, PasswordReset
+from accounts.models import User, OTP
 
 
 # Register your models here.
@@ -9,6 +9,6 @@ class UserAdmin(admin.ModelAdmin):
     list_filter = ('user_type',)
 
 
-@admin.register(PasswordReset)
-class PasswordResetAdmin(admin.ModelAdmin):
-    list_display = ('token', 'email', 'created_at')
+@admin.register(OTP)
+class OTPAdmin(admin.ModelAdmin):
+    list_display = ('otp', 'email', 'created_at')

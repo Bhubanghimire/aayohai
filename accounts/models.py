@@ -1,5 +1,6 @@
 import uuid
-
+from django.utils import timezone
+from datetime import timedelta
 from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
@@ -58,8 +59,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.first_name
 
 
-class PasswordReset(models.Model):
-    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    email = models.EmailField(unique=True)
+class OTP(models.Model):
+    email = models.EmailField()
+    otp = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_used = models.BooleanField(default=False)
+
+    def is_valid(self):
+        # Check if the OTP is still valid (e.g., not older than 10 minutes)
+        expiration_time = self.created_at + timedelta(minutes=10)
+        return timezone.now() < expiration_time and not self.is_used
+
+    class Meta:
+        unique_together = (('email', 'otp'),)
