@@ -4,6 +4,7 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.db.transaction import atomic
+from system.models import ConfigChoice
 
 
 # Create your models here.
@@ -39,6 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=255)
     address = models.CharField(max_length=255)
     profile = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    user_type = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT, null=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
