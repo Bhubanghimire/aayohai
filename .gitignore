@@ -8,3 +8,5 @@ __pycache__/
 aayohai/.env
 .idea
 venv/
+*.Ds_Store
+
