@@ -1,0 +1,10 @@
+*.log
+media
+staticfiles
+db.sqlite3
+migrations/
+__pycache__/
+.idea/
+aayohai/.env
+.idea
+venv/
