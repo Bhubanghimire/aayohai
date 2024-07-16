@@ -20,10 +20,10 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 from accounts.urls import account_router
+from system.urls import choice_router
 
 urlpatterns = [
-                  path("admin/", admin.site.urls),
-                  path("api/", include((account_router.urls,
-                                        'accounts'), namespace='accounts'), ),
-              ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
-                         )
+    path("admin/", admin.site.urls),
+    path("api/", include((account_router.urls, 'accounts'), namespace='accounts')),
+    path("api/type/", include((choice_router.urls, 'system'), namespace='system')),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
