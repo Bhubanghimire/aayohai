@@ -1,4 +1,5 @@
 from django.core.mail import EmailMultiAlternatives
+from django.http import JsonResponse
 from django.utils.html import strip_tags
 from rest_framework.response import Response
 import jwt
@@ -172,4 +173,14 @@ class AuthViewSet(viewsets.ViewSet):
             return Response({'message': 'Done'})
         else:
             return Response({'message': 'Otp is not matched'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['POST'], url_path='otp-verify')
+    def otp_verify(self, request):
+        data = request.data
+        check_otp = OTP.objects.filter(email=data['email'], otp=data['otp'])
+        if check_otp.exists():
+            return JsonResponse({'message': 'OTP  matched'}, status=status.HTTP_200_OK)
+        return Response({'message': 'OTP not matched'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
