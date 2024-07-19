@@ -28,6 +28,6 @@ from system.serializers import ConfigChoiceSerializer
 class GenderViewSet(viewsets.ModelViewSet):
     queryset = ConfigChoice.objects.all()
     serializer_class = ConfigChoiceSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
 
 
