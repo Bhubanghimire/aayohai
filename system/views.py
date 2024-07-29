@@ -30,4 +30,28 @@ class GenderViewSet(viewsets.ModelViewSet):
     serializer_class = ConfigChoiceSerializer
     permission_classes = [AllowAny]
 
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(category__name="gender_type")
+        return queryset
+
+
+class RoomViewSet(viewsets.ModelViewSet):
+    queryset = ConfigChoice.objects.all()
+    serializer_class = ConfigChoiceSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(category__name="room_type")
+        return queryset
+
+
+class FurnishingViewSet(viewsets.ModelViewSet):
+    queryset = ConfigChoice.objects.all()
+    serializer_class = ConfigChoiceSerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(category__name="furnishing")
+        return queryset
+
 
