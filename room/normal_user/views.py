@@ -24,7 +24,7 @@ from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from tutorial.quickstart.serializers import UserSerializer
 from room.models import Room, State
-from room.serializers import RoomSerializers, StateSerializer
+from room.serializers import RoomSerializers, StateSerializer, RoomDetailSerializer
 from system.serializers import ConfigChoiceSerializer
 from accounts.models import User
 # Create your views here.
@@ -61,9 +61,16 @@ class DashboardViewSet(viewsets.ModelViewSet):
 
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
-    serializer_class = ConfigChoiceSerializer
-    permission_classes = [AllowAny]
+    serializer_class = RoomDetailSerializer
+    # permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = super().get_queryset().filter(category__name="furnishing")
+        queryset = super().get_queryset()
         return queryset
+
+    def retrieve(self, request, pk=None):
+        print("test", pk)
+        room = self.get_object()
+
+        serializer = self.serializer_class(room)
+        return Response(serializer.data)

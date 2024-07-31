@@ -40,7 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=255)
     # phone = models.CharField(max_length=255)
     # address = models.CharField(max_length=255)
-    # profile = models.ImageField(upload_to='profiles/', null=True, blank=True)
+    profile = models.ImageField(upload_to='profiles/', null=True, blank=True)
     birth_date = models.DateField(blank=True, null=True)
     gender = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT, blank=True, null=True, related_name="gender")
     user_type = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT, null=True, blank=True)

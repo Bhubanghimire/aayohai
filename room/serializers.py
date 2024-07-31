@@ -1,14 +1,30 @@
 from django.db.models import Sum
 from rest_framework import serializers
-from room.models import Room, Location, State, Review, Gallery
+from room.models import Room, Location, State, Review, Gallery, Amenities
 from system.serializers import ConfigChoiceSerializer
-from accounts.serializers import UserSerializers
+from accounts.serializers import UserDetailSerializers
+
+
+class AmenitiesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Amenities
+        fields = '__all__'
 
 
 class GallerySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gallery
         fields = ['image']
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = ["id", "rating", "review", "user"]
+
+    def to_representation(self, instance):
+        self.fields['user'] = UserDetailSerializers(read_only=True)
+        return super(ReviewSerializer, self).to_representation(instance)
 
 
 class StateSerializer(serializers.ModelSerializer):
@@ -60,3 +76,27 @@ class RoomSerializers(serializers.ModelSerializer):
         self.fields['category'] = ConfigChoiceSerializer(read_only=True)
         # self.fields['review'] = UserSerializers(read_only=True)
         return super(RoomSerializers, self).to_representation(instance)
+
+
+class RoomDetailSerializer(RoomSerializers):
+    reviews = serializers.SerializerMethodField()
+    gallery = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Room
+        fields = ['id', 'name', 'description', 'amenities', 'rule', 'length', 'breadth', 'price', 'review', 'reviews', 'gallery']
+
+    def to_representation(self, instance):
+        self.fields['state'] = StateSerializer(read_only=True)
+        self.fields['amenities'] = AmenitiesSerializer(many=True, read_only=True)
+        return super(RoomDetailSerializer, self).to_representation(instance)
+
+    def get_gallery(self, obj):
+        gallery = Gallery.objects.filter(room=obj)
+        gallery = GallerySerializer(gallery, many=True).data
+        return gallery
+
+    def get_reviews(self, obj):
+        reviews = Review.objects.filter(room=obj)
+        reviews_serializers = ReviewSerializer(reviews, many=True).data
+        return reviews_serializers
