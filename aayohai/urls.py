@@ -21,9 +21,12 @@ from django.conf import settings
 
 from accounts.urls import account_router
 from system.urls import choice_router
+from room.normal_user.urls import room_router
+
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include((account_router.urls, 'accounts'), namespace='accounts')),
     path("api/type/", include((choice_router.urls, 'system'), namespace='system')),
+    path("api/room/", include((room_router.urls, 'room'), namespace='room')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
