@@ -65,9 +65,7 @@ class RoomSerializers(serializers.ModelSerializer):
         return review
 
     def get_cover_image(self, obj):
-        print(obj)
         cover_image = Gallery.objects.filter(room=obj).first()
-        print(cover_image)
         cover_image = GallerySerializer(cover_image).data
         return cover_image["image"]
 
@@ -100,3 +98,9 @@ class RoomDetailSerializer(RoomSerializers):
         reviews = Review.objects.filter(room=obj)
         reviews_serializers = ReviewSerializer(reviews, many=True).data
         return reviews_serializers
+
+
+class RoomSearchSerializer(RoomSerializers):
+    class Meta:
+        model = Room
+        fields = ['id', 'name', 'category', 'price', "cover_image"]

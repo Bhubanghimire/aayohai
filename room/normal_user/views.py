@@ -23,8 +23,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from tutorial.quickstart.serializers import UserSerializer
-from room.models import Room, State
-from room.serializers import RoomSerializers, StateSerializer, RoomDetailSerializer
+from room.models import Room, State, Location
+from room.serializers import RoomSerializers, StateSerializer, RoomDetailSerializer, RoomSearchSerializer
 from system.serializers import ConfigChoiceSerializer
 from accounts.models import User
 # Create your views here.
@@ -69,8 +69,38 @@ class RoomViewSet(viewsets.ModelViewSet):
         return queryset
 
     def retrieve(self, request, pk=None):
-        print("test", pk)
         room = self.get_object()
 
         serializer = self.serializer_class(room)
         return Response(serializer.data)
+
+
+class RoomSearchViewSet(viewsets.ModelViewSet):
+    queryset = Room.objects.all()
+    serializer_class = RoomSearchSerializer
+    # permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        category = self.request.query_params.get('category', None)
+        furnishing = self.request.query_params.get('furnishing', None)
+        location = self.request.query_params.get('location', None)
+
+        if category:
+            queryset = queryset.filter(category=category)
+
+        if furnishing:
+            queryset = queryset.filter(furnishing=furnishing)
+
+        if location:
+            loc = Location.objects.filter(state_id=location)
+            queryset = queryset.filter(location__in=loc)
+
+        return queryset
+
+    # def retrieve(self, request, pk=None):
+    #     room = self.get_object()
+    #     serializer = self.serializer_class(room)
+    #     return Response(serializer.data)
+
+
