@@ -7,8 +7,8 @@ from system.models import ConfigChoice
 # Create your models here.
 class State(models.Model):
     country = models.CharField(max_length=100)
-    name = models.CharField(max_length=50)
-    image = models.ImageField(upload_to='images/')
+    name = models.CharField(max_length=50, unique=True)
+    image = models.ImageField(upload_to='images/', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

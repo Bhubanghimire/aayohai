@@ -76,19 +76,17 @@ class RoomViewSet(viewsets.ModelViewSet):
         data = request.data
         images = request.FILES.getlist('image')
 
-
         # Parse 'amenities' from JSON string if needed
         if isinstance(data.get('amenities'), str):
             data['amenities'] = json.loads(data['amenities'])
 
-        # Ensure 'amenities' is a list of primary keys
-        if not isinstance(data['amenities'], list):
-            return JsonResponse({"error": "Amenities should be a list of primary key values."}, status=400)
-
-        print(type(data['amenities']), data['amenities'])
 
         # Add other necessary fields
-        location = Location.objects.first()
+        location_data = json.loads(data.get('location'))
+        state = State.objects.get_or_create(country=location_data['country'], name=location_data['state'])[0]
+        location_data.pop('state')
+        location_data.pop('country')
+        location = Location.objects.create(state=state, **location_data)
         data['location'] = location.pk
         data['added_by'] = request.user.id
 
