@@ -104,3 +104,12 @@ class RoomSearchSerializer(RoomSerializers):
     class Meta:
         model = Room
         fields = ['id', 'name', 'category', 'price', "cover_image"]
+
+
+class RoomCreateSerializer(serializers.ModelSerializer):
+    # amenities = serializers.PrimaryKeyRelatedField(many=True, queryset=Amenities.objects.all())
+
+    class Meta:
+        model = Room
+        # fields = '__all__'
+        exclude = ['amenities']

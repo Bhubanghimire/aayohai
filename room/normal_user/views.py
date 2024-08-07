@@ -1,5 +1,8 @@
+import json
+
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.db import transaction
 
 from django.utils.html import strip_tags
 from rest_framework.response import Response
@@ -23,8 +26,9 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from tutorial.quickstart.serializers import UserSerializer
-from room.models import Room, State, Location
-from room.serializers import RoomSerializers, StateSerializer, RoomDetailSerializer, RoomSearchSerializer
+from room.models import Room, State, Location, Gallery
+from room.serializers import RoomSerializers, StateSerializer, RoomDetailSerializer, RoomSearchSerializer, \
+    RoomCreateSerializer
 from system.serializers import ConfigChoiceSerializer
 from accounts.models import User
 # Create your views here.
@@ -67,6 +71,46 @@ class RoomViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         return queryset
+
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        images = request.FILES.getlist('image')
+
+
+        # Parse 'amenities' from JSON string if needed
+        if isinstance(data.get('amenities'), str):
+            data['amenities'] = json.loads(data['amenities'])
+
+        # Ensure 'amenities' is a list of primary keys
+        if not isinstance(data['amenities'], list):
+            return JsonResponse({"error": "Amenities should be a list of primary key values."}, status=400)
+
+        print(type(data['amenities']), data['amenities'])
+
+        # Add other necessary fields
+        location = Location.objects.first()
+        data['location'] = location.pk
+        data['added_by'] = request.user.id
+
+        serializer = RoomCreateSerializer(data=data)
+        if serializer.is_valid():
+            try:
+                with transaction.atomic():
+                    instance = serializer.save()
+
+                    # Add amenities after instance is created
+                    for amenity_id in data['amenities']:
+                        instance.amenities.add(amenity_id)
+
+                    instance.save()
+                    for image in images:
+                        Gallery.objects.create(room=instance, image=image)
+                return JsonResponse({"data": serializer.data}, status=201)
+            except Exception as e:
+                print("Error while saving room:", str(e))
+                return JsonResponse({"error": str(e)}, status=400)
+        else:
+            return JsonResponse(serializer.errors, status=400)
 
     def retrieve(self, request, pk=None):
         room = self.get_object()
