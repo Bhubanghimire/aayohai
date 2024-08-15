@@ -26,9 +26,9 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from tutorial.quickstart.serializers import UserSerializer
-from room.models import Room, State, Location, Gallery
+from room.models import Room, State, Location, Gallery, Amenities
 from room.serializers import RoomSerializers, StateSerializer, RoomDetailSerializer, RoomSearchSerializer, \
-    RoomCreateSerializer
+    RoomCreateSerializer, AmenitiesSerializer
 from system.serializers import ConfigChoiceSerializer
 from accounts.models import User
 # Create your views here.
@@ -146,3 +146,6 @@ class RoomSearchViewSet(viewsets.ModelViewSet):
     #     return Response(serializer.data)
 
 
+class AmenitiesViewSet(viewsets.ModelViewSet):
+    queryset = Amenities.objects.all()
+    serializer_class = AmenitiesSerializer
