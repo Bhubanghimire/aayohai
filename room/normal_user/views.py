@@ -124,9 +124,13 @@ class RoomSearchViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        search = self.request.query_params.get('search', None)
         category = self.request.query_params.get('category', None)
         furnishing = self.request.query_params.get('furnishing', None)
         location = self.request.query_params.get('location', None)
+
+        if search:
+            queryset = queryset.filter(name__icontains=search)
 
         if category:
             queryset = queryset.filter(category=category)
