@@ -73,7 +73,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        data = request.data
+        data = request.data.copy()
         images = request.FILES.getlist('image')
 
         # Parse 'amenities' from JSON string if needed
