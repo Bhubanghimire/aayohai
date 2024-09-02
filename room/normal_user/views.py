@@ -73,7 +73,8 @@ class RoomViewSet(viewsets.ModelViewSet):
         return queryset
 
     def create(self, request, *args, **kwargs):
-        data = request.data.copy()
+        data = request.data
+        request.data._mutable = True
         images = request.FILES.getlist('image')
 
         # Parse 'amenities' from JSON string if needed
@@ -89,6 +90,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         location = Location.objects.create(state=state, **location_data)
         data['location'] = location.pk
         data['added_by'] = request.user.id
+        request.data._mutable = False
 
         serializer = RoomCreateSerializer(data=data)
         if serializer.is_valid():
