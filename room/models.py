@@ -15,6 +15,9 @@ class State(models.Model):
     def __str__(self):
         return self.name
 
+    class Meta:
+        unique_together = ('country', 'name')
+
 
 class Location(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
@@ -72,7 +75,7 @@ class Review(models.Model):
 
 
 class Gallery(models.Model):
-    room = models.ForeignKey(Room, on_delete=models.PROTECT)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='gallery/')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
