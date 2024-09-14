@@ -84,6 +84,7 @@ class RoomViewSet(viewsets.ModelViewSet):
 
         # Add other necessary fields
         location_data = json.loads(data.get('location'))
+        print(location_data)
         state = State.objects.get_or_create(country=location_data['country'], name=location_data['state'])[0]
         location_data.pop('state')
         location_data.pop('country')
@@ -104,12 +105,14 @@ class RoomViewSet(viewsets.ModelViewSet):
 
                     instance.save()
                     for image in images:
+                        print("image create")
                         Gallery.objects.create(room=instance, image=image)
                 return JsonResponse({"data": serializer.data, "message": "room added successfully."}, status=201)
             except Exception as e:
                 print("Error while saving room:", str(e))
                 return JsonResponse({"error": str(e)}, status=400)
         else:
+            print("error vo", serializer.errors)
             return JsonResponse(serializer.errors, status=400)
 
     def retrieve(self, request, pk=None):
