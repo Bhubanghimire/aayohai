@@ -34,7 +34,6 @@ from accounts.models import User
 # Create your views here.
 
 
-
 class DashboardViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSerializers

@@ -1,4 +1,4 @@
-from django.db.models import Sum
+from django.db.models import Sum, Avg
 from rest_framework import serializers
 from room.models import Room, Location, State, Review, Gallery, Amenities
 from system.serializers import ConfigChoiceSerializer
@@ -59,7 +59,7 @@ class RoomSerializers(serializers.ModelSerializer):
                   ]
 
     def get_review(self, obj):
-        review = Review.objects.filter(room=obj).aggregate(Sum('rating'))['rating__sum']
+        review = Review.objects.filter(room=obj).aggregate(Avg('rating'))['rating__avg']
         if review is None:
             review = 0.0
         return review
