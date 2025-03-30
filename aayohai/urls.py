@@ -24,6 +24,7 @@ from system.urls import choice_router
 from room.normal_user.urls import room_router
 from book.urls import book_router
 from payment.urls import payment_router
+from grocery.urls import grocery_router
 
 
 urlpatterns = [
@@ -33,4 +34,5 @@ urlpatterns = [
     path("api/room/", include((room_router.urls, 'room'), namespace='room')),
     path("api/book/", include((book_router.urls, 'book'), namespace='book')),
     path("api/payment/", include((payment_router.urls, 'payment'), namespace='payment')),
+    path("api/grocery/", include((grocery_router.urls, 'grocery'), namespace='grocery')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
