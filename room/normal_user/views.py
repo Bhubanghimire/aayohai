@@ -217,3 +217,28 @@ class StripeSession(viewsets.ModelViewSet):
             return JsonResponse({"error": str(e)}, status=400)
 
         return JsonResponse({"message": "Webhook received"}, status=200)
+
+    @action(detail=False, methods=['post'])
+    def create_payment_intent(self, request):
+        try:
+            data = request.data
+            amount = int(data.get('amount', 200))  # in paisa/cents
+            currency = data.get('currency', 'usd')
+
+            # Optional: add customer metadata, description
+            intent = stripe.PaymentIntent.create(
+                amount=amount,
+                currency=currency,
+                metadata={'integration_check': 'accept_a_payment'},
+            )
+
+            return Response({
+                'clientSecret': intent.client_secret
+            })
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+
+
+
+
