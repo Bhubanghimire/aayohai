@@ -24,7 +24,7 @@ from system.urls import choice_router
 from room.normal_user.urls import room_router
 from book.urls import book_router
 from payment.urls import payment_router
-from grocery.urls import grocery_router
+from grocery.normal_user.urls import grocery_router
 
 
 urlpatterns = [
