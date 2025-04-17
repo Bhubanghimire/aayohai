@@ -9,6 +9,8 @@ class Grocery(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
     cover_image = models.ImageField()
+    quantity = models.PositiveIntegerField()
+    quantity_unit = models.ForeignKey(ConfigChoice, on_delete=models.CASCADE, related_name="quantity_unit")
     price = models.DecimalField(decimal_places=2, max_digits=10)
     category = models.ForeignKey(ConfigChoice, on_delete=models.CASCADE)
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)

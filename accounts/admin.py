@@ -1,5 +1,5 @@
 from django.contrib import admin
-from accounts.models import User, OTP
+from accounts.models import User, OTP, Advertise
 
 
 # Register your models here.
@@ -12,3 +12,8 @@ class UserAdmin(admin.ModelAdmin):
 @admin.register(OTP)
 class OTPAdmin(admin.ModelAdmin):
     list_display = ('otp', 'email', 'created_at')
+
+
+@admin.register(Advertise)
+class AdvertiseAdmin(admin.ModelAdmin):
+    list_display = ('id', 'ad', 'created_at')

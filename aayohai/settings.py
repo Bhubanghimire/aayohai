@@ -49,8 +49,10 @@ INSTALLED_APPS = [
     "system",
     "accounts",
     "room",
+    "grocery",
     "book",
     "payment",
+
 ]
 
 AUTH_USER_MODEL = "accounts.User"

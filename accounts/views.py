@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from django.core.mail import EmailMultiAlternatives
 from django.http import JsonResponse
 from django.utils.html import strip_tags
@@ -22,8 +24,12 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from accounts.middleware import generate_access_token, generate_refresh_token, generate_otp
-from accounts.models import OTP
-from accounts.serializers import UserSerializers
+from accounts.models import OTP, Advertise
+from accounts.serializers import UserSerializers, AdvertiseSerializer
+from grocery.models import Grocery
+from grocery.serializers import GrocerySerializers
+from room.models import Room
+from room.serializers import RoomSerializers
 
 # from accounts.models import OTP
 # from .serializers import UserSerializers
@@ -117,7 +123,7 @@ class AuthViewSet(viewsets.ViewSet):
         else:
             OTP.objects.create(email=email, otp=generated_otp)
 
-        context ={'title': 'Otp', 'content': generated_otp}
+        context = {'title': 'Otp', 'content': generated_otp}
         html_content = render_to_string("email_template.html", context=context)
         text_content = strip_tags(html_content)
         email = EmailMultiAlternatives('Otp for email verification', text_content, settings.DEFAULT_FROM_EMAIL, [email])
@@ -134,7 +140,7 @@ class AuthViewSet(viewsets.ViewSet):
     def register(self, request):
         data = request.data
         try:
-            check_otp = OTP.objects.get(email=data['email'],otp=data['otp'])
+            check_otp = OTP.objects.get(email=data['email'], otp=data['otp'])
         except OTP.DoesNotExist:
             return Response({'message': 'OTP not found'}, status=HTTP_400_BAD_REQUEST)
 
@@ -183,4 +189,24 @@ class AuthViewSet(viewsets.ViewSet):
         return Response({'message': 'OTP not matched'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class MainViewSet(viewsets.ViewSet):
 
+    @action(detail=False, methods=['GET'], url_path='advertise')
+    def advertise(self, request):
+        ad_list = Advertise.objects.filter(active=True)
+        serializer = AdvertiseSerializer(ad_list, context={"request": request}, many=True).data
+        return Response({'data': serializer, 'message': 'Data Fetched.'})
+
+    @action(detail=False, methods=['GET'], url_path='new-arrival')
+    def new_arrival(self, request):
+        seven_days_ago = datetime.now() - timedelta(days=7)
+        ad_list = Room.objects.filter(created_at__gte=seven_days_ago)
+        serializer = RoomSerializers(ad_list, context={"request": request}, many=True).data
+        return Response({'data': serializer, 'message': 'Data Fetched.'})
+
+    @action(detail=False, methods=['GET'], url_path='groceries')
+    def groceries(self, request):
+        seven_days_ago = datetime.now() - timedelta(days=7)
+        grocery_list = Grocery.objects.filter(created_at__gte=seven_days_ago)
+        serializer = GrocerySerializers(grocery_list, context={"request": request}, many=True).data
+        return Response({'data': serializer, 'message': 'Data Fetched.'})

@@ -74,3 +74,10 @@ class OTP(models.Model):
 
     class Meta:
         unique_together = (('email', 'otp'),)
+
+
+class Advertise(models.Model):
+    ad = models.ImageField(upload_to='ads/', null=True, blank=True)
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
