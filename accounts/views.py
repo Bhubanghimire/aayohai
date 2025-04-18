@@ -210,3 +210,15 @@ class MainViewSet(viewsets.ViewSet):
         grocery_list = Grocery.objects.filter(created_at__gte=seven_days_ago)
         serializer = GrocerySerializers(grocery_list, context={"request": request}, many=True).data
         return Response({'data': serializer, 'message': 'Data Fetched.'})
+
+
+class ProfileViewSet(viewsets.ViewSet):
+    # permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        user = User.objects.filter().first()  # request.user
+        serializer = UserSerializers(user).data
+        return Response({'data': serializer, 'message': 'Data Fetched.'})
+
+    # def retrieve(self, request, pk=None):
+    #     # Not using pk, returning the authenticated user
