@@ -70,6 +70,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'accounts.authentication.SafeJWTAuthentication',
     ],
+    'DEFAULT_RENDERER_CLASSES': [
+        'system.renderers.CustomJSONRenderer',
+    ],
     'COERCE_DECIMAL_TO_STRING': False,
 
 }
