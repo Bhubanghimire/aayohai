@@ -11,7 +11,7 @@ class EventCategorySerializer(serializers.ModelSerializer):
 class EventPriceSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventPrice
-        fields = ("id", "price", "title")
+        fields = ("id", "price", "title", "available_ticket", "limit")
 
 
 class EventSerializers(serializers.ModelSerializer):
