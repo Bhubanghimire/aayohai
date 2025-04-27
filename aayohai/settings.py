@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "grocery",
     "book",
     "payment",
+    "events"
 
 ]
 
@@ -70,9 +71,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'accounts.authentication.SafeJWTAuthentication',
     ],
-    'DEFAULT_RENDERER_CLASSES': [
-        'system.renderers.CustomJSONRenderer',
-    ],
+    # 'DEFAULT_RENDERER_CLASSES': [
+    #     'system.renderers.CustomJSONRenderer',
+    # ],
     'COERCE_DECIMAL_TO_STRING': False,
 
 }

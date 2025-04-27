@@ -21,6 +21,7 @@ from django.conf import settings
 
 from accounts.urls import account_router
 from book.normal_user.urls import book_router
+from events.normal_user.urls import event_router
 from system.urls import choice_router
 from room.normal_user.urls import room_router
 from payment.urls import payment_router
@@ -35,4 +36,5 @@ urlpatterns = [
     path("api/payment/", include((payment_router.urls, 'payment'), namespace='payment')),
     path("api/grocery/", include((grocery_router.urls, 'grocery'), namespace='grocery')),
     path("api/book/", include((book_router.urls, 'book'), namespace='book')),
+    path("api/event/", include((event_router.urls, 'events'), namespace='events')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
