@@ -18,7 +18,7 @@ class Event(models.Model):
     description = models.TextField()
     event_date = models.DateTimeField()
     start_date = models.DateTimeField()
-    end_date = models.DateTimeField()
+    # end_date = models.DateTimeField()
     location = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
