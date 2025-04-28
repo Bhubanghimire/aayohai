@@ -14,6 +14,7 @@ class EventCategory(models.Model):
 class Event(models.Model):
     category = models.ForeignKey(EventCategory, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
+    status = models.BooleanField(default=False)
     cover_image = models.ImageField(upload_to="events/covers/")
     description = models.TextField()
     event_date = models.DateTimeField()
