@@ -1,13 +1,15 @@
 from rest_framework.decorators import action
 from accounts.models import Advertise
 from accounts.serializers import AdvertiseSerializer
-from book.models import Cart
+from book.models import Cart, Book, BookItem, EventItem, OrderItem
 from book.serializers import GartSerializers
+from events.models import Event
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
 from rest_framework import serializers, viewsets, status
 from rest_framework.response import Response
 
+from payment.models import Invoice
 from system.models import ConfigChoice
 from system.serializers import ConfigChoiceSerializer
 import json
@@ -65,72 +67,64 @@ class StripeSession(viewsets.ModelViewSet):
 
     def create(self, request):
         try:
-            checkout_session = stripe.checkout.Session.create(
-                payment_method_types=["card"],
-                line_items=[
-                    {
-                        "price_data": {
-                            "currency": "usd",
-                            "unit_amount": 500,  # Amount in cents (e.g., $10.00)
-                            "product_data": {
-                                "name": "Sample Product",
-                            },
-                        },
-                        "quantity": 1,
-                    }
-                ],
-                mode="payment",
-                success_url=f"{HOST_URL}/api/room/stripe-session/stripe_webhook/",
-                # cancel_url="/api/room/dashboard/",
-            )
-            return Response({"checkout_url": checkout_session.url}, status=status.HTTP_200_OK)
-        except Exception as e:
-            print("error vo", e)
-            return Response({"error": str(e)}, status=400)
-
-    @action(detail=False, methods=['post'])
-    def stripe_webhook(self, request):
-        payload = request.body  # ✅ Ensure raw body is used
-        sig_header = request.headers.get("Stripe-Signature")
-
-        if not sig_header:
-            return JsonResponse({"error": "Missing Stripe-Signature header"}, status=400)
-
-        try:
-            event = stripe.Webhook.construct_event(
-                payload, sig_header, stripe.api_key
-            )
-
-            if event["type"] == "checkout.session.completed":
-                session = event["data"]["object"]
-                print("Payment Successful:", session)
-
-        except stripe.error.SignatureVerificationError as e:
-            return JsonResponse({"error": f"Signature verification failed: {str(e)}"}, status=400)
-        except ValueError as e:
-            return JsonResponse({"error": f"Invalid payload: {str(e)}"}, status=400)
-        except Exception as e:
-            return JsonResponse({"error": str(e)}, status=400)
-
-        return JsonResponse({"message": "Webhook received"}, status=200)
-
-    @action(detail=False, methods=['post'])
-    def create_payment_intent(self, request):
-        try:
             data = request.data
-            amount = int(data.get('amount', 200))  # in paisa/cents
+            # amount = int(data.get('amount', 200))
             currency = data.get('currency', 'usd')
+            ids = data.get('object_ids', [])
+            table_object = data.get('object')
 
-            # Optional: add customer metadata, description
+
+            book_obj = Book.objects.create(user=request.user, status_id=1)
+
+            total_amount = 0
+            if table_object == "Room":
+                for room_id in ids:
+                    room_obj = Room.objects.get(pk=room_id)
+                    total_amount += room_obj.price
+                    BookItem.objects.create(book=book_obj, room=room_obj, price=room_obj.price,
+                                            total_amount=room_obj.price)
+
+            elif table_object == "Event":
+                for event in ids:
+                    total_amount += event["price"]
+                    EventItem.objects.create(book=book_obj, event_id=event['id'], price=event["price"],
+                                             total_amount=event["price"])
+            elif table_object == "Grocery":
+                for grocery in ids:
+                    total_amount += grocery["price"]
+                    OrderItem.objects.create(book=book_obj, grocery_id=grocery['id'], price=grocery["price"],
+                                             total_amount=grocery["price"])
+
+            last_inovice = Invoice.objects.last()
+            if last_inovice:
+                invoice_number = last_inovice.invoice_number + 1
+            else:
+                invoice_number = 1000
+            Invoice.objects.create(book=book_obj, invoice_amount=total_amount, invoice_number=invoice_number,
+                                   total_amount=total_amount)
+
             intent = stripe.PaymentIntent.create(
-                amount=amount,
+                amount=int(total_amount * 100),
                 currency=currency,
                 metadata={'integration_check': 'accept_a_payment'},
             )
-
             return Response({
-                'clientSecret': intent.client_secret
+                'clientSecret': intent.client_secret,
+                "book_id": book_obj.uuid,
             })
 
         except Exception as e:
             return Response({'error': str(e)}, status=400)
+
+    @action(detail=False, methods=['post'])
+    def update_status(self, request):
+            data = request.data
+            book = data.get('book')
+            payment_complete = data.get('payment_complete')
+            reference_id = data.get('reference_id')
+            Invoice.objects.filter(book=book).update(payment_complete=payment_complete, reference_id=reference_id)
+            return Response({
+                'message': "Updated payment complete",
+            })
+
+

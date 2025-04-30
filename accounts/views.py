@@ -93,7 +93,7 @@ class AuthViewSet(viewsets.ViewSet):
             )
 
         user = authenticate(request, email=email, password=password)
-
+        print(user)
         if user is None:
             raise serializers.ValidationError(
                 {"message": "A user with this email and password was not found."}

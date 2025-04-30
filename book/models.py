@@ -2,6 +2,7 @@ from django.db import models
 
 import uuid
 from accounts.models import User
+from events.models import Event
 from grocery.models import Grocery
 from room.models import Room
 from system.models import ConfigChoice
@@ -54,6 +55,8 @@ class BookItem(models.Model):
     discount = models.ForeignKey(RoomDiscount, on_delete=models.CASCADE, null=True, blank=True)
     price = models.DecimalField(max_digits=17, decimal_places=2)
     total_amount = models.DecimalField(max_digits=17, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.room.name} {self.book}'
@@ -68,3 +71,31 @@ class Cart(models.Model):
 
     def __str__(self):
         return f'{self.user}'
+
+
+class OrderItem(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    grocery = models.ForeignKey(Grocery, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=250, null=True, blank=True)
+    discount = models.ForeignKey(RoomDiscount, on_delete=models.CASCADE, null=True, blank=True)
+    price = models.DecimalField(max_digits=17, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=17, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.grocery.name}'
+
+
+class EventItem(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=250, null=True, blank=True)
+    discount = models.ForeignKey(RoomDiscount, on_delete=models.CASCADE, null=True, blank=True)
+    price = models.DecimalField(max_digits=17, decimal_places=2)
+    total_amount = models.DecimalField(max_digits=17, decimal_places=2)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.event.title}'

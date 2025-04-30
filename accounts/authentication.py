@@ -21,7 +21,7 @@ class SafeJWTAuthentication(BaseAuthentication):
             raise exceptions.AuthenticationFailed('Token prefix missing')
         except Exception:
             raise exceptions.AuthenticationFailed("Invalid Access Token")
-
+        print(payload)
         user = User.objects.filter(id=payload['user_id']).first()
 
         if not user:
