@@ -1,3 +1,4 @@
+import json
 from datetime import datetime, timedelta
 
 from django.core.mail import EmailMultiAlternatives
@@ -117,12 +118,13 @@ class AuthViewSet(viewsets.ViewSet):
         email = data['email']
         generated_otp = generate_otp()
         check_status = OTP.objects.filter(email=email)
-
+        print("status", check_status)
         if check_status.exists():
             check_status.update(otp=generated_otp)
+            print("updated", check_status)
         else:
-            OTP.objects.create(email=email, otp=generated_otp)
-
+            obj = OTP.objects.create(email=email, otp=generated_otp)
+            print("obj created", obj)
         context = {'title': 'Otp', 'content': generated_otp}
         html_content = render_to_string("email_template.html", context=context)
         text_content = strip_tags(html_content)
@@ -219,6 +221,27 @@ class ProfileViewSet(viewsets.ViewSet):
         user = User.objects.filter().first()  # request.user
         serializer = UserSerializers(user).data
         return Response({'data': serializer, 'message': 'Data Fetched.'})
+
+    @action(detail=False, methods=['delete'])
+    def delete_user(self, request):
+        data = json.loads(request.body)
+        user_obj = User.objects.filter(id=data['user_id'])
+        otp = data['otp']
+
+        if user_obj.exists():
+            user = user_obj.first()
+            otp_check = OTP.objects.filter(email=user.email, otp=otp)
+            if not otp_check.exists():
+                return Response({'message': 'OTP not found'}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.is_deleted = True
+            user.deleted_at = datetime.now()
+            user.save()
+            otp_check.delete()
+            # user.delete()
+            return Response({'message': 'User deleted.'}, status=200)
+        else:
+            return Response({'message': 'User does not exist.'}, status=404)
 
     # def retrieve(self, request, pk=None):
     #     # Not using pk, returning the authenticated user

@@ -5,11 +5,11 @@ from accounts.models import User
 from events.models import Event
 from grocery.models import Grocery
 from room.models import Room
-from system.models import ConfigChoice
+from system.models import ConfigChoice, SoftDeletable
 
 
 # Create your models here.
-class RoomDiscount(models.Model):
+class RoomDiscount(SoftDeletable):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     discount_type = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT)
@@ -23,7 +23,7 @@ class RoomDiscount(models.Model):
         return str(self.discount_type)
 
 
-class GroceryDiscount(models.Model):
+class GroceryDiscount(SoftDeletable):
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     discount_type = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT)
@@ -37,7 +37,7 @@ class GroceryDiscount(models.Model):
         return str(self.discount_type)
 
 
-class Book(models.Model):
+class Book(SoftDeletable):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.ForeignKey(ConfigChoice, on_delete=models.CASCADE)
@@ -48,7 +48,7 @@ class Book(models.Model):
         return str(self.user)
 
 
-class BookItem(models.Model):
+class BookItem(SoftDeletable):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     comment = models.CharField(max_length=250, null=True, blank=True)
@@ -62,7 +62,7 @@ class BookItem(models.Model):
         return f'{self.room.name} {self.book}'
 
 
-class Cart(models.Model):
+class Cart(SoftDeletable):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     grocery = models.ForeignKey(Grocery, on_delete=models.CASCADE)
     quantity = models.IntegerField()

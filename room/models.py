@@ -1,7 +1,7 @@
 from django.db import models
 
 from accounts.models import User
-from system.models import ConfigChoice
+from system.models import ConfigChoice, SoftDeletable
 
 
 # Create your models here.
@@ -43,7 +43,7 @@ class Amenities(models.Model):
         return self.name
 
 
-class Room(models.Model):
+class Room(SoftDeletable):
     name = models.CharField(max_length=50)
     description = models.TextField()
     rule = models.TextField()
@@ -55,8 +55,6 @@ class Room(models.Model):
     furnishing = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT, null=True)
     price = models.FloatField()
     added_by = models.ForeignKey(User, on_delete=models.PROTECT)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name

@@ -5,11 +5,18 @@ from django.contrib.auth.base_user import BaseUserManager, AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.db.transaction import atomic
-from system.models import ConfigChoice
+from system.models import ConfigChoice, SoftDeletable
 
 
 # Create your models here.
 class UserManager(BaseUserManager):
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_deleted=False)
+
+    def get_deleted(self):
+        return super().get_queryset().filter(is_deleted=True)
+
     def _create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError('Users must have an email address')
@@ -34,7 +41,7 @@ class UserManager(BaseUserManager):
         return self._create_user(email, password, **extra_fields)
 
 
-class User(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin, SoftDeletable):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)

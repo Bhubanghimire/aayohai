@@ -3,9 +3,11 @@ from django.db import models
 from book.models import Book
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from system.models import SoftDeletable
+
 
 # Create your models here.
-class Invoice(models.Model):
+class Invoice(SoftDeletable):
     book = models.OneToOneField(Book, on_delete=models.CASCADE)
     invoice_number = models.IntegerField(unique=True, auto_created=True, validators=[
         MinValueValidator(1000),
@@ -17,8 +19,7 @@ class Invoice(models.Model):
     reference_id = models.CharField(max_length=250)
     payment_complete = models.BooleanField(default=False)
     invoice_amount = models.DecimalField(max_digits=17, decimal_places=2)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return str(self.invoice_number)

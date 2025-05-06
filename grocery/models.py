@@ -1,11 +1,11 @@
 from django.db import models
 
 from accounts.models import User
-from system.models import ConfigChoice
+from system.models import ConfigChoice, SoftDeletable
 
 
 # Create your models here.
-class Grocery(models.Model):
+class Grocery(SoftDeletable):
     name = models.CharField(max_length=100)
     description = models.TextField()
     cover_image = models.ImageField()
