@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timedelta
 
 from django.contrib.auth.hashers import check_password
@@ -27,7 +28,7 @@ from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from accounts.middleware import generate_access_token, generate_refresh_token, generate_otp
 from accounts.models import OTP, Advertise
-from accounts.serializers import UserSerializers, AdvertiseSerializer
+from accounts.serializers import UserSerializers, AdvertiseSerializer, UserUpdateSerializer
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
 from room.models import Room
@@ -237,7 +238,35 @@ class ProfileViewSet(viewsets.ViewSet):
     def list(self, request):
         user = User.objects.filter().first()  # request.user
         serializer = UserSerializers(user).data
+        serializer.pop('password')
         return Response({'data': serializer, 'message': 'Data Fetched.'})
+
+    def put(self, request):
+        user = self.request.user
+        profile = request.FILES.get('profile')
+        if profile:
+            if user.profile:
+                os.remove(user.profile.path)
+            user.profile = profile
+            user.save()
+
+        required_fields = ['first_name', 'last_name', 'birth_date', 'gender']
+        missing_fields = [field for field in required_fields if
+                          field not in request.data or request.data[field] in [None, '']]
+
+        if missing_fields:
+            return Response(
+                {'error': f'Missing required fields: {", ".join(missing_fields)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        serializer = UserUpdateSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+
+            return Response({'data': serializer.data, 'message': 'Data updated.'})
+        else:
+            return Response({'data': serializer.errors, 'message': 'Data update failed.'})
 
     @action(detail=False, methods=['delete'])
     def delete_user(self, request):

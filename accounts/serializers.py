@@ -29,3 +29,9 @@ class AdvertiseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Advertise
         fields = ['id', "ad"]
+
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", 'birth_date', 'gender']
