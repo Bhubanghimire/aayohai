@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta
 
+from django.contrib.auth.hashers import check_password
 from django.core.mail import EmailMultiAlternatives
 from django.http import JsonResponse
 from django.utils.html import strip_tags
@@ -189,6 +190,22 @@ class AuthViewSet(viewsets.ViewSet):
         if check_otp.exists():
             return JsonResponse({'message': 'OTP  matched'}, status=status.HTTP_200_OK)
         return Response({'message': 'OTP not matched'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['POST'], url_path='password-change')
+    def change_password(self, request, *args, **kwargs):
+        user = self.request.user
+        old_pw = request.data.get('old_password', False)
+        new_pw = request.data.get('new_password')
+
+        if (old_pw or new_pw) is None:
+            return Response({'data': {}, 'message': 'Please provide old and new password!'}, status=400)
+
+        if check_password(old_pw, user.password):
+            user.set_password(new_pw)
+            user.save()
+            return Response({'data': {}, 'message': 'Password changed successfully!'}, status=200)
+        else:
+            return Response({'data': {}, 'message': 'The Old Password does not match!'}, status=400)
 
 
 class MainViewSet(viewsets.ViewSet):
