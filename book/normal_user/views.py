@@ -3,7 +3,8 @@ from accounts.models import Advertise
 from accounts.serializers import AdvertiseSerializer
 from book.models import Cart, Book, BookItem, EventItem, OrderItem
 from book.serializers import GartSerializers
-from events.models import Event
+from django.db import transaction
+from events.models import Event, EventPrice
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
 from rest_framework import serializers, viewsets, status
@@ -65,56 +66,55 @@ class StripeSession(viewsets.ModelViewSet):
     queryset = Amenities.objects.all()
     serializer_class = AmenitiesSerializer
 
+    @transaction.atomic
     def create(self, request):
-        try:
-            data = request.data
-            # amount = int(data.get('amount', 200))
-            currency = data.get('currency', 'usd')
-            ids = data.get('object_ids', [])
-            table_object = data.get('object')
+        data = request.data
+        currency = data.get('currency', 'aud')
+        ids = data.get('object_ids', [])
+        table_object = data.get('object')
+
+        book_obj = Book.objects.create(user=request.user, status_id=1)
+
+        total_amount = 0
+        if table_object == "Room":
+            for room_id in ids:
+                room_obj = Room.objects.get(pk=room_id)
+                total_amount += room_obj.price
+                BookItem.objects.create(book=book_obj, room=room_obj, price=room_obj.price,
+                                        total_amount=room_obj.price)
+
+        elif table_object == "Event":
+            for event in ids:
+                event_price = EventPrice.objects.get(id=event['price_id'])
+                total_amount += event_price.price*event['count']
+                EventItem.objects.create(book=book_obj, event_id=event['event_id'], price=event_price.price,
+                                         count=event['count'],
+                                         total_amount=event_price.price*event['count'])
+        elif table_object == "Grocery":
+            for grocery in ids:
+                total_amount += grocery["price"]
+                OrderItem.objects.create(book=book_obj, grocery_id=grocery['id'], price=grocery["price"],
+                                         total_amount=grocery["price"])
+
+        last_inovice = Invoice.objects.last()
+        if last_inovice:
+            invoice_number = last_inovice.invoice_number + 1
+        else:
+            invoice_number = 1000
+        Invoice.objects.create(book=book_obj, invoice_amount=total_amount, invoice_number=invoice_number,
+                               total_amount=total_amount)
+
+        intent = stripe.PaymentIntent.create(
+            amount=int(total_amount * 100),
+            currency=currency,
+            metadata={'integration_check': 'accept_a_payment'},
+        )
+        return Response({
+            'clientSecret': intent.client_secret,
+            "book_id": book_obj.uuid,
+        })
 
 
-            book_obj = Book.objects.create(user=request.user, status_id=1)
-
-            total_amount = 0
-            if table_object == "Room":
-                for room_id in ids:
-                    room_obj = Room.objects.get(pk=room_id)
-                    total_amount += room_obj.price
-                    BookItem.objects.create(book=book_obj, room=room_obj, price=room_obj.price,
-                                            total_amount=room_obj.price)
-
-            elif table_object == "Event":
-                for event in ids:
-                    total_amount += event["price"]
-                    EventItem.objects.create(book=book_obj, event_id=event['id'], price=event["price"],
-                                             total_amount=event["price"])
-            elif table_object == "Grocery":
-                for grocery in ids:
-                    total_amount += grocery["price"]
-                    OrderItem.objects.create(book=book_obj, grocery_id=grocery['id'], price=grocery["price"],
-                                             total_amount=grocery["price"])
-
-            last_inovice = Invoice.objects.last()
-            if last_inovice:
-                invoice_number = last_inovice.invoice_number + 1
-            else:
-                invoice_number = 1000
-            Invoice.objects.create(book=book_obj, invoice_amount=total_amount, invoice_number=invoice_number,
-                                   total_amount=total_amount)
-
-            intent = stripe.PaymentIntent.create(
-                amount=int(total_amount * 100),
-                currency=currency,
-                metadata={'integration_check': 'accept_a_payment'},
-            )
-            return Response({
-                'clientSecret': intent.client_secret,
-                "book_id": book_obj.uuid,
-            })
-
-        except Exception as e:
-            return Response({'error': str(e)}, status=400)
 
     @action(detail=False, methods=['post'])
     def update_status(self, request):

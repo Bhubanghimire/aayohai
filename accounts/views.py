@@ -233,10 +233,10 @@ class MainViewSet(viewsets.ViewSet):
 
 
 class ProfileViewSet(viewsets.ViewSet):
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def list(self, request):
-        user = User.objects.filter().first()  # request.user
+        user = self.request.user
         serializer = UserSerializers(user).data
         serializer.pop('password')
         return Response({'data': serializer, 'message': 'Data Fetched.'})

@@ -25,4 +25,4 @@ class OrderItemAdmin(admin.ModelAdmin):
 
 @admin.register(EventItem)
 class EventItemAdmin(admin.ModelAdmin):
-    list_display = ['id', "event", "created_at", "updated_at"]
+    list_display = ['id', "event","count", "price", "total_amount", "created_at", "updated_at"]
