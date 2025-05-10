@@ -43,7 +43,7 @@ class EventPrice(SoftDeletable):
     title = models.CharField(max_length=100)
     available_ticket = models.IntegerField(default=100000)
     limit = models.IntegerField(default=10)
-    price = models.DecimalField(decimal_places=2, max_digits=10)
+    price = models.IntegerField()  # db will store in cent
 
     def __str__(self):
         return self.title
