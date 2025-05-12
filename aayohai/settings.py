@@ -71,9 +71,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'accounts.authentication.SafeJWTAuthentication',
     ],
-    # 'DEFAULT_RENDERER_CLASSES': [
-    #     'system.renderers.CustomJSONRenderer',
-    # ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'COERCE_DECIMAL_TO_STRING': False,
 
 }

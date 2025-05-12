@@ -1,10 +1,12 @@
 from rest_framework.decorators import action
 from accounts.models import Advertise
+from accounts.pagination import CustomPagination
 from accounts.serializers import AdvertiseSerializer
 from book.models import Cart, Book, BookItem, EventItem, OrderItem
 from book.serializers import GartSerializers, BookEventSerializer
 from django.db import transaction
 from events.models import Event, EventPrice
+from events.serializers import EventSerializers
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
 from rest_framework import serializers, viewsets, status
@@ -114,8 +116,6 @@ class StripeSession(viewsets.ModelViewSet):
             "book_id": book_obj.uuid,
         })
 
-
-
     @action(detail=False, methods=['post'])
     def update_status(self, request):
             data = request.data
@@ -129,5 +129,29 @@ class StripeSession(viewsets.ModelViewSet):
 
 
 class BookEventList(viewsets.ModelViewSet):
-    model = Book
+    queryset = Book.objects.all()
     serializer_class = BookEventSerializer
+    pagination_class = CustomPagination
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(user=self.request.user)
+        final_query = queryset.filter(eventitem__isnull=False).distinct()
+        return final_query
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        final_list = []
+        for obj in queryset:
+            event_item = EventItem.objects.filter(book=obj).first()
+            json_obj = {
+                "uuid":obj.uuid,
+                # # "event_name":event_item.event.event_name,
+                # "event_time":"event time",
+                # "price":"price",
+                "event":EventSerializers(event_item.event).data,
+                "status":obj.status.name,
+            }
+            final_list.append(json_obj)
+
+        return  JsonResponse({"data":final_list})
+

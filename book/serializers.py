@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from book.models import Cart
+from book.models import Cart, Book
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
 
@@ -14,6 +14,9 @@ class GartSerializers(serializers.ModelSerializer):
         rep['grocery'] = GrocerySerializers(instance.grocery).data
         return rep
 
-class BookEventSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    title = serializers.CharField()
+
+class BookEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Book
+        exclude = ('is_deleted', 'deleted_at')
+
