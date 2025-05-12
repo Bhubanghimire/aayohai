@@ -82,7 +82,7 @@ class RoomDetailSerializer(RoomSerializers):
 
     class Meta:
         model = Room
-        fields = ['id', 'name', 'description', 'amenities', 'rule', 'length', 'breadth', 'price', 'review', 'reviews', 'gallery']
+        fields = ['id', 'name', 'description', 'amenities', 'rule', 'length', 'breadth', 'price','inspection_price', 'review', 'reviews', 'gallery']
 
     def to_representation(self, instance):
         self.fields['state'] = StateSerializer(read_only=True)

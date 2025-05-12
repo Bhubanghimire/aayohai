@@ -2,7 +2,7 @@ from rest_framework.decorators import action
 from accounts.models import Advertise
 from accounts.serializers import AdvertiseSerializer
 from book.models import Cart, Book, BookItem, EventItem, OrderItem
-from book.serializers import GartSerializers
+from book.serializers import GartSerializers, BookEventSerializer
 from django.db import transaction
 from events.models import Event, EventPrice
 from grocery.models import Grocery
@@ -78,7 +78,7 @@ class StripeSession(viewsets.ModelViewSet):
         total_amount = 0
         if table_object == "Room":
             for room_id in ids:
-                room_obj = Room.objects.get(pk=room_id)
+                room_obj = Room.objects.filter(pk=room_id).first()
                 total_amount += room_obj.price
                 BookItem.objects.create(book=book_obj, room=room_obj, price=room_obj.price,
                                         total_amount=room_obj.price)
@@ -122,9 +122,12 @@ class StripeSession(viewsets.ModelViewSet):
             book = data.get('book')
             payment_complete = data.get('payment_complete')
             reference_id = data.get('reference_id')
-            Invoice.objects.filter(book=book).update(payment_complete=payment_complete, reference_id=reference_id)
+            Invoice.objects.filter(book=book).update(payment_status=payment_complete, reference_id=reference_id)
             return Response({
                 'message': "Updated payment complete",
             })
 
 
+class BookEventList(viewsets.ModelViewSet):
+    model = Book
+    serializer_class = BookEventSerializer

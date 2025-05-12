@@ -13,3 +13,7 @@ class GartSerializers(serializers.ModelSerializer):
         rep = super().to_representation(instance)
         rep['grocery'] = GrocerySerializers(instance.grocery).data
         return rep
+
+class BookEventSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField()

@@ -17,7 +17,7 @@ class Invoice(SoftDeletable):
     discount = models.DecimalField(max_digits=17, decimal_places=2, default=0.0)
     billing_address = models.CharField(max_length=250)
     reference_id = models.CharField(max_length=250)
-    payment_complete = models.BooleanField(default=False)
+    payment_status = models.TextField()
     invoice_amount = models.DecimalField(max_digits=17, decimal_places=2)
 
 

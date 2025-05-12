@@ -54,6 +54,7 @@ class Room(SoftDeletable):
     location = models.ForeignKey(Location, on_delete=models.PROTECT)
     furnishing = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT, null=True)
     price = models.FloatField()
+    inspection_price = models.IntegerField(default=10)
     added_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
     def __str__(self):
