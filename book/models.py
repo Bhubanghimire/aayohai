@@ -76,6 +76,7 @@ class Cart(SoftDeletable):
 class OrderItem(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
     grocery = models.ForeignKey(Grocery, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
     comment = models.CharField(max_length=250, null=True, blank=True)
     discount = models.ForeignKey(RoomDiscount, on_delete=models.CASCADE, null=True, blank=True)
     price = models.DecimalField(max_digits=17, decimal_places=2)
