@@ -3,7 +3,7 @@ from accounts.models import Advertise
 from accounts.pagination import CustomPagination
 from accounts.serializers import AdvertiseSerializer
 from book.models import Cart, Book, BookItem, EventItem, OrderItem
-from book.serializers import GartSerializers, BookEventSerializer
+from book.serializers import GartSerializers, BookEventSerializer, OrderItemSerializer
 from django.db import transaction
 from events.models import Event, EventPrice
 from events.serializers import EventSerializers
@@ -67,6 +67,7 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 class StripeSession(viewsets.ModelViewSet):
     queryset = Amenities.objects.all()
     serializer_class = AmenitiesSerializer
+    permission_classes = [IsAuthenticated]
 
     @transaction.atomic
     def create(self, request):
@@ -88,10 +89,10 @@ class StripeSession(viewsets.ModelViewSet):
         elif table_object == "Event":
             for event in ids:
                 event_price = EventPrice.objects.get(id=event['price_id'])
-                total_amount += event_price.price*event['count']
+                total_amount += event_price.price * event['count']
                 EventItem.objects.create(book=book_obj, event_id=event['event_id'], price=event_price.price,
                                          count=event['count'],
-                                         total_amount=event_price.price*event['count'])
+                                         total_amount=event_price.price * event['count'])
         elif table_object == "Grocery":
             for grocery in ids:
                 total_amount += grocery["price"]
@@ -118,20 +119,21 @@ class StripeSession(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['post'])
     def update_status(self, request):
-            data = request.data
-            book = data.get('book')
-            payment_complete = data.get('payment_complete')
-            reference_id = data.get('reference_id')
-            Invoice.objects.filter(book=book).update(payment_status=payment_complete, reference_id=reference_id)
-            return Response({
-                'message': "Updated payment complete",
-            })
+        data = request.data
+        book = data.get('book')
+        payment_complete = data.get('payment_complete')
+        reference_id = data.get('reference_id')
+        Invoice.objects.filter(book=book).update(payment_status=payment_complete, reference_id=reference_id)
+        return Response({
+            'message': "Updated payment complete",
+        })
 
 
 class BookEventList(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookEventSerializer
     pagination_class = CustomPagination
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(user=self.request.user)
@@ -144,14 +146,36 @@ class BookEventList(viewsets.ModelViewSet):
         for obj in queryset:
             event_item = EventItem.objects.filter(book=obj).first()
             json_obj = {
-                "uuid":obj.uuid,
-                # # "event_name":event_item.event.event_name,
-                # "event_time":"event time",
-                # "price":"price",
-                "event":EventSerializers(event_item.event).data,
-                "status":obj.status.name,
+                "uuid": obj.uuid,
+                "event": EventSerializers(event_item.event).data,
+                "status": obj.status.name,
             }
             final_list.append(json_obj)
 
-        return  JsonResponse({"data":final_list})
+        return JsonResponse({"data": final_list})
 
+
+class GroceryBookList(viewsets.ModelViewSet):
+    queryset = Book.objects.all()
+    serializer_class = BookEventSerializer
+    pagination_class = CustomPagination
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = super().get_queryset().filter(user=self.request.user)
+        final_query = queryset.filter(orderitem__isnull=False).distinct()
+        return final_query
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        final_list = []
+        for obj in queryset:
+            event_item = OrderItem.objects.filter(book=obj)
+            json_obj = {
+                "uuid": obj.uuid,
+                "grocery": OrderItemSerializer(event_item, many=True).data,
+                "status": obj.status.name,
+            }
+            final_list.append(json_obj)
+
+        return JsonResponse({"data": final_list})

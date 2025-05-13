@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from book.models import Cart, Book
+from book.models import Cart, Book, OrderItem
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
 
@@ -20,3 +20,8 @@ class BookEventSerializer(serializers.ModelSerializer):
         model = Book
         exclude = ('is_deleted', 'deleted_at')
 
+
+class OrderItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OrderItem
+        exclude = ('created_at', 'updated_at')

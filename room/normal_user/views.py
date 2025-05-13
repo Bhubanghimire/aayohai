@@ -34,6 +34,8 @@ from room.serializers import RoomSerializers, StateSerializer, RoomDetailSeriali
     RoomCreateSerializer, AmenitiesSerializer
 from system.serializers import ConfigChoiceSerializer
 from accounts.models import User
+
+
 # Create your views here.
 
 
@@ -68,6 +70,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
 class RoomViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomDetailSerializer
+
     # permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -82,7 +85,6 @@ class RoomViewSet(viewsets.ModelViewSet):
         # Parse 'amenities' from JSON string if needed
         if isinstance(data.get('amenities'), str):
             data['amenities'] = json.loads(data['amenities'])
-
 
         # Add other necessary fields
         location_data = json.loads(data.get('location'))
@@ -127,6 +129,7 @@ class RoomViewSet(viewsets.ModelViewSet):
 class RoomSearchViewSet(viewsets.ModelViewSet):
     queryset = Room.objects.all()
     serializer_class = RoomSearchSerializer
+
     # permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -161,11 +164,14 @@ class AmenitiesViewSet(viewsets.ModelViewSet):
     queryset = Amenities.objects.all()
     serializer_class = AmenitiesSerializer
 
+
 stripe.api_key = "sk_test_51PlsK0LZ4Y3l2niTCIL3G1YiWCv7V1hNcHH7LWPehTgOy53ZYaT5oBtKiSJoAAxokvBB1JBil5cxEiFVFFIaQX9P000DqfINHa"
+
 
 class StripeSession(viewsets.ModelViewSet):
     queryset = Amenities.objects.all()
     serializer_class = AmenitiesSerializer
+    permission_classes = [IsAuthenticated]
 
     def create(self, request):
         try:
@@ -238,7 +244,3 @@ class StripeSession(viewsets.ModelViewSet):
 
         except Exception as e:
             return Response({'error': str(e)}, status=400)
-
-
-
-
