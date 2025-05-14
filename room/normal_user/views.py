@@ -109,7 +109,6 @@ class RoomViewSet(viewsets.ModelViewSet):
 
                     instance.save()
                     for image in images:
-                        print("image create")
                         Gallery.objects.create(room=instance, image=image)
                 return JsonResponse({"data": serializer.data, "message": "room added successfully."}, status=201)
             except Exception as e:
