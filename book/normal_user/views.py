@@ -199,7 +199,7 @@ class RoomBookList(viewsets.ModelViewSet):
             book_item = BookItem.objects.filter(book=obj)
             json_obj = {
                 "uuid": obj.uuid,
-                "grocery": BookItemSerializer(book_item, many=True).data,
+                "room": BookItemSerializer(book_item, many=True).data,
                 "status": obj.status.name,
             }
             final_list.append(json_obj)
