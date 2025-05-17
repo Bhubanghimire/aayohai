@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 from accounts.urls import account_router
+from accounts.views import Homepage
 from book.normal_user.urls import book_router
 from events.normal_user.urls import event_router
 from system.urls import choice_router
@@ -30,6 +31,7 @@ from grocery.normal_user.urls import grocery_router
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("", Homepage.as_view(), name="homepage"),
     path("api/", include((account_router.urls, 'accounts'), namespace='accounts')),
     path("api/type/", include((choice_router.urls, 'system'), namespace='system')),
     path("api/room/", include((room_router.urls, 'room'), namespace='room')),

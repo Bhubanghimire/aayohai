@@ -6,6 +6,7 @@ from django.contrib.auth.hashers import check_password
 from django.core.mail import EmailMultiAlternatives
 from django.http import JsonResponse
 from django.utils.html import strip_tags
+from django.views.generic.base import TemplateView
 from rest_framework.response import Response
 import jwt
 from rest_framework.response import Response
@@ -39,6 +40,8 @@ from room.serializers import RoomSerializers
 #
 User = get_user_model()
 
+class Homepage(TemplateView):
+    template_name = "homepage.html"
 
 class AuthViewSet(viewsets.ViewSet):
     permission_classes_by_action = {
