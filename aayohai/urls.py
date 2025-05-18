@@ -39,4 +39,4 @@ urlpatterns = [
     path("api/grocery/", include((grocery_router.urls, 'grocery'), namespace='grocery')),
     path("api/book/", include((book_router.urls, 'book'), namespace='book')),
     path("api/event/", include((event_router.urls, 'events'), namespace='events')),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

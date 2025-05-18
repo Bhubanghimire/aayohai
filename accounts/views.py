@@ -222,15 +222,15 @@ class MainViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['GET'], url_path='new-arrival')
     def new_arrival(self, request):
-        seven_days_ago = datetime.now() - timedelta(days=7)
-        ad_list = Room.objects.filter(created_at__gte=seven_days_ago)
+        # seven_days_ago = datetime.now() - timedelta(days=7)
+        ad_list = Room.objects.all().order_by("-id")[0:5]    #filter(created_at__gte=seven_days_ago)
         serializer = RoomSerializers(ad_list, context={"request": request}, many=True).data
         return Response({'data': serializer, 'message': 'Data Fetched.'})
 
     @action(detail=False, methods=['GET'], url_path='groceries')
     def groceries(self, request):
         seven_days_ago = datetime.now() - timedelta(days=7)
-        grocery_list = Grocery.objects.filter(created_at__gte=seven_days_ago)
+        grocery_list = Grocery.objects.all().order_by("-id")[0:5]   #filter(created_at__gte=seven_days_ago)
         serializer = GrocerySerializers(grocery_list, context={"request": request}, many=True).data
         return Response({'data': serializer, 'message': 'Data Fetched.'})
 
