@@ -1,7 +1,9 @@
+from django.db.models.aggregates import Sum
 from rest_framework.decorators import action
 from accounts.models import Advertise
 from accounts.pagination import CustomPagination
 from accounts.serializers import AdvertiseSerializer
+from book.middleware import createUnique, CreateTicketFunction, send_mail_with_ticket
 from book.models import Cart, Book, BookItem, EventItem, OrderItem
 from book.serializers import GartSerializers, BookEventSerializer, OrderItemSerializer, BookItemSerializer
 from django.db import transaction
@@ -12,7 +14,7 @@ from grocery.serializers import GrocerySerializers
 from rest_framework import serializers, viewsets, status
 from rest_framework.response import Response
 
-from payment.models import Invoice
+from payment.models import Invoice, Ticket
 from system.models import ConfigChoice
 from system.serializers import ConfigChoiceSerializer
 import json
@@ -124,6 +126,40 @@ class StripeSession(viewsets.ModelViewSet):
         payment_complete = data.get('payment_complete')
         reference_id = data.get('reference_id')
         Invoice.objects.filter(book=book).update(payment_status=payment_complete, reference_id=reference_id)
+        event_items = EventItem.objects.filter(book=book)
+        if event_items.exists():
+            event = event_items.first().event
+            for event_rate in event_items:
+                price = event_rate.event_price
+                total_count = price.available_ticket
+                ticket_count = Ticket.objects.filter(event=event, event_price= price).aggregate(Sum("no_of_ticket"))['no_of_ticket__sum']
+                if not ticket_count:
+                    ticket_count = 0
+                print(ticket_count, total_count, event_rate.count)
+
+                if (total_count-ticket_count) < event_rate.count:
+                    return JsonResponse({"message":"No ticket available."})
+
+                # ticket_obj = Ticket.objects.create(
+                #        user = self.request.user,
+                #    event = event,
+                #    event_price = price,
+                #    invoice = Invoice.objects.filter(book=book).first(),
+                #    ticket_number = createUnique(),
+                #    ticket_bought =True,
+                #    scanned = False,
+                #    no_of_ticket = event_rate.count
+                #    )
+
+                # img = CreateTicketFunction(request, ticket_obj, event.title)
+                # print("test", img)
+                ticket_obj = Ticket.objects.last()
+                # Ticket.objects.filter(id=ticket_obj.id).update(ticket_img=img)
+                send_mail_with_ticket((ticket_obj))
+                # else:
+
+
+            print("event items")
         return Response({
             'message': "Updated payment complete",
         })

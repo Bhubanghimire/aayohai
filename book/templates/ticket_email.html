@@ -1,0 +1,77 @@
+<html>
+  <head>
+        <title>Testing QR code</title>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            function generateBarCode()
+            {
+                var nric = $('#text').val();
+                var url = 'https://api.qrserver.com/v1/create-qr-code/?data=' + nric + '&amp;size=50x50';
+                $('#barcode').attr('src', url);
+            }
+        </script>
+    </head>
+
+<body style="background-color:#e2e1e0;font-family: Open Sans, sans-serif;font-size:100%;font-weight:400;line-height:1.4;color:#000;">
+  <table style="max-width:670px;margin:50px auto 10px;background-color:#fff;padding:50px;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);-moz-box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24); border-top: solid 10px black;">
+    <thead>
+      <tr>
+        <th style="text-align:left;">Ticket Booking App</th>
+        <th style="text-align:right;font-weight:400;">{{ ticket_created_at }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="height:35px;"></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="border: solid 1px #ddd; padding:10px 20px;">
+          <p style="font-size:14px;margin:0 0 6px 0;"><span style="font-weight:bold;display:inline-block;min-width:150px">Order status</span><b style="color:green;font-weight:normal;margin:0">Success</b></p>
+          <p style="font-size:14px;margin:0 0 6px 0;"><span style="font-weight:bold;display:inline-block;min-width:146px">Ticket Number</span> {{ ticket_number }}</p>
+          <p style="font-size:14px;margin:0 0 0 0;"><span style="font-weight:bold;display:inline-block;min-width:146px">Ticket amount</span> Rs.  {{ event_rate }}</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="height:35px;"></td>
+      </tr>
+      <tr>
+        <td style="width:50%;padding:20px;vertical-align:top">
+          <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px">Name</span> {{ user_full_name }}</p>
+          <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px;">Email</span> {{ user_email }}</p>
+          <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px;">Phone</span> {{ user_phone }}</p>
+          <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px;">No of Ticket</span> {{ no_of_ticket }}</p>
+          <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px;">Event Title</span> {{ event_title }}</p>
+          <p style="margin:0 0 10px 0;padding:0;font-size:14px;"><span style="display:block;font-weight:bold;font-size:13px;">Event Time</span> {{ event_start_time }} to {{ event_end_date }}</p>
+        </td>
+
+      </tr>
+      <tr>
+        <td colspan="2" style="font-size:20px;padding:30px 15px 0 15px;">Ticket QR</td>
+      </tr>
+      <tr>
+        <td colspan="2" style="padding:15px;">
+          <input type="hidden" id="text" type="text"
+            value={{ ticket_number }} style="Width:20%"
+            oninput='generateBarCode();' />
+
+      <img id='barcode'
+            src={{base_url}}{{ticket_image}}
+            alt=""
+            title="HELLO"
+            height="354px"
+            width="1000px" />
+        </td>
+      </tr>
+    </tbody>
+    <tfooter>
+      <tr>
+        <td colspan="2" style="font-size:14px;padding:50px 15px 0 15px;">
+          <strong style="display:block;margin:0 0 10px 0;">Regards</strong> aayohai app<br> nepal<br><br>
+          <b>Email:</b> info@aayohai.com
+        </td>
+      </tr>
+    </tfooter>
+  </table>
+</body>
+
+</html>
