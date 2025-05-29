@@ -1,3 +1,5 @@
+from django.db.models.query_utils import Q
+
 from events.models import Event, TermsConditions, FeatureEvent
 from rest_framework import serializers, viewsets, status, filters
 from events.serializers import EventSerializers, TermsConditionsSerializer
@@ -15,8 +17,10 @@ class EventModelViewSet(viewsets.ModelViewSet):
         today_date = datetime.date.today()
         queryset = super().get_queryset().filter(status=True)
         queryset = self.filter_queryset(queryset)
-        # status = self.request.query_params.get('status')
+        search = self.request.query_params.get('search')
         queryset = queryset.filter(start_date__lte=today_date, event_date__gte=today_date)
+        if search:
+            queryset =queryset.filter(Q(title__icontains=search)|Q(location__icontains=search))
         # if status == "active":
         #     queryset = queryset.filter(start_date__gt=today_date, event_date__lte=today_date)
         # elif status == "upcoming":
