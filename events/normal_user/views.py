@@ -15,12 +15,13 @@ class EventModelViewSet(viewsets.ModelViewSet):
         today_date = datetime.date.today()
         queryset = super().get_queryset().filter(status=True)
         queryset = self.filter_queryset(queryset)
-        status = self.request.query_params.get('status')
-        if status == "upcoming":
-            queryset = queryset.filter(start_date__gt=today_date)
-        elif status == "upcoming":
-            queryset = queryset.filter(start_date__lte=today_date)
-        print(queryset)
+        # status = self.request.query_params.get('status')
+        queryset = queryset.filter(start_date__lte=today_date, event_date__gte=today_date)
+        # if status == "active":
+        #     queryset = queryset.filter(start_date__gt=today_date, event_date__lte=today_date)
+        # elif status == "upcoming":
+        #     queryset = queryset.filter(start_date__lte=today_date)
+        # print(queryset)
         return queryset
 
     def retrieve(self, request, *args, **kwargs):
