@@ -62,6 +62,41 @@ class CartViewSet(viewsets.ModelViewSet):
     queryset = Cart.objects.all()
     serializer_class = GartSerializers
 
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response({
+            'message': 'Cart list fetched successfully.',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        return Response({
+            'message': 'Item added to cart successfully.',
+            'data': serializer.data
+        }, status=status.HTTP_201_CREATED)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({
+            'message': 'Cart item updated successfully.',
+            'data': serializer.data
+        }, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({
+            'message': 'Cart item deleted successfully.'
+        }, status=status.HTTP_204_NO_CONTENT)
+
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -135,31 +170,29 @@ class StripeSession(viewsets.ModelViewSet):
                 ticket_count = Ticket.objects.filter(event=event, event_price= price).aggregate(Sum("no_of_ticket"))['no_of_ticket__sum']
                 if not ticket_count:
                     ticket_count = 0
-                print(ticket_count, total_count, event_rate.count)
 
                 if (total_count-ticket_count) < event_rate.count:
                     return JsonResponse({"message":"No ticket available."})
 
-                # ticket_obj = Ticket.objects.create(
-                #        user = self.request.user,
-                #    event = event,
-                #    event_price = price,
-                #    invoice = Invoice.objects.filter(book=book).first(),
-                #    ticket_number = createUnique(),
-                #    ticket_bought =True,
-                #    scanned = False,
-                #    no_of_ticket = event_rate.count
-                #    )
+                ticket_obj = Ticket.objects.create(
+                       user = self.request.user,
+                   event = event,
+                   event_price = price,
+                   invoice = Invoice.objects.filter(book=book).first(),
+                   ticket_number = createUnique(),
+                   ticket_bought =True,
+                   scanned = False,
+                   no_of_ticket = event_rate.count
+                   )
+                #
+                img, qr = CreateTicketFunction(request, ticket_obj, event.title)
+                Ticket.objects.filter(id=ticket_obj.id).update(ticket_img=img, qr_img=qr)
+                try:
+                    send_mail_with_ticket((ticket_obj))
+                except Exception:
+                    print("mail send error")
+                    pass
 
-                # img = CreateTicketFunction(request, ticket_obj, event.title)
-                # print("test", img)
-                ticket_obj = Ticket.objects.last()
-                # Ticket.objects.filter(id=ticket_obj.id).update(ticket_img=img)
-                send_mail_with_ticket((ticket_obj))
-                # else:
-
-
-            print("event items")
         return Response({
             'message': "Updated payment complete",
         })

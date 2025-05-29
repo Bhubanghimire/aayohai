@@ -36,8 +36,7 @@ def send_mail_with_ticket(ticket):
     base_url = settings.HOST_URL
     attach = ticket.ticket_img.url
     url = base_url + attach
-    print(attach, url)
-    fd = urlopen(url)
+    # fd = urlopen(url)
 
     img_url = ticket.ticket_img.url
     html_content = render_to_string("ticket_email.html", {'title': 'Otp',
@@ -66,11 +65,12 @@ def send_mail_with_ticket(ticket):
 
 def CreateTicketFunction(request, ticket_number, name):
     uniqueid = uuid.uuid1()
-    event = Event.objects.filter(ticket__ticket_number=ticket_number).first()
+    event = ticket_number.event
     event = EventSerializers(event).data
     # url = event["cover_image"]
     base_url = settings.HOST_URL
     attach = event["cover_image"]
+    print(attach, event, ticket_number)
     url = base_url + attach
 
     fd = urlopen(url)
@@ -89,9 +89,12 @@ def CreateTicketFunction(request, ticket_number, name):
     image.paste(qr, (40, 85))
     draw.text((45, 300), name, font=font, fill='#000000')
     path = f'media/ticket/'
+    qr_path = f"media/qr/"
     os.makedirs(path, exist_ok=True)  # Creates the directory if it doesn't exist
+    os.makedirs(qr_path, exist_ok=True)  # Creates the directory if it doesn't exist
     image.save(f'media/ticket/{uniqueid}.png')
+    qr.save(f'media/qr/{uniqueid}.png')
 
-    image.show()
+    # image.show()
 
-    return f'/ticket/{uniqueid}.png'
+    return f'/ticket/{uniqueid}.png', f'/qr/{uniqueid}.png'

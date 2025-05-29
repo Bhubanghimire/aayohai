@@ -8,7 +8,7 @@ from room.serializers import RoomSearchSerializer
 class GartSerializers(serializers.ModelSerializer):
     class Meta:
         model = Cart
-        fields = "__all__"
+        fields = ['id', 'user', 'grocery', 'quantity']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -19,13 +19,13 @@ class GartSerializers(serializers.ModelSerializer):
 class BookEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
-        exclude = ('is_deleted', 'deleted_at','created_at', 'updated_at')
+        exclude = ('is_deleted', 'deleted_at', 'created_at', 'updated_at')
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        exclude = ('is_deleted', 'deleted_at','created_at', 'updated_at')
+        exclude = ('is_deleted', 'deleted_at', 'created_at', 'updated_at')
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -36,7 +36,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 class BookItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = BookItem
-        exclude = ('is_deleted', 'deleted_at','created_at', 'updated_at')
+        exclude = ('is_deleted', 'deleted_at', 'created_at', 'updated_at')
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)

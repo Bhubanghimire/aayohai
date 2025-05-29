@@ -35,6 +35,7 @@ class Ticket(models.Model):
     ticket_number = models.CharField(max_length=255, default="No Ticket")
     ticket_bought = models.BooleanField(default=False)
     ticket_img = models.ImageField(upload_to="ticket", default="ticket/ticket_pic.png")
+    qr_img = models.ImageField(upload_to="qr", default="qr/ticket_pic.png")
     scanned = models.BooleanField(default=False)
     no_of_ticket = models.IntegerField(default=1)
     created_at = models.DateTimeField(auto_now_add=True)
