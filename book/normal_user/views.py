@@ -167,23 +167,24 @@ class StripeSession(viewsets.ModelViewSet):
             for event_rate in event_items:
                 price = event_rate.event_price
                 total_count = price.available_ticket
-                ticket_count = Ticket.objects.filter(event=event, event_price= price).aggregate(Sum("no_of_ticket"))['no_of_ticket__sum']
+                ticket_count = Ticket.objects.filter(event=event, event_price=price).aggregate(Sum("no_of_ticket"))[
+                    'no_of_ticket__sum']
                 if not ticket_count:
                     ticket_count = 0
 
-                if (total_count-ticket_count) < event_rate.count:
-                    return JsonResponse({"message":"No ticket available."})
+                if (total_count - ticket_count) < event_rate.count:
+                    return JsonResponse({"message": "No ticket available."})
 
                 ticket_obj = Ticket.objects.create(
-                       user = self.request.user,
-                   event = event,
-                   event_price = price,
-                   invoice = Invoice.objects.filter(book=book).first(),
-                   ticket_number = createUnique(),
-                   ticket_bought =True,
-                   scanned = False,
-                   no_of_ticket = event_rate.count
-                   )
+                    user=self.request.user,
+                    event=event,
+                    event_price=price,
+                    invoice=Invoice.objects.filter(book=book).first(),
+                    ticket_number=createUnique(),
+                    ticket_bought=True,
+                    scanned=False,
+                    no_of_ticket=event_rate.count
+                )
                 #
                 img, qr = CreateTicketFunction(request, ticket_obj, event.title)
                 Ticket.objects.filter(id=ticket_obj.id).update(ticket_img=img, qr_img=qr)
@@ -206,6 +207,7 @@ class BookEventList(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(user=self.request.user)
+        print(queryset)
         final_query = queryset.filter(eventitem__isnull=False).distinct()
         return final_query
 
@@ -218,6 +220,11 @@ class BookEventList(viewsets.ModelViewSet):
                 "uuid": obj.uuid,
                 "event": EventSerializers(event_item.event).data,
                 "status": obj.status.name,
+                "event_price": {"id": event_item.event_price.id,
+                                "title": event_item.event_price.title,
+                                "price": event_item.event_price.price},
+                "count": event_item.count,
+                "total_amount": event_item.total_amount
             }
             final_list.append(json_obj)
 
@@ -231,6 +238,7 @@ class GroceryBookList(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        print(self.request.user)
         queryset = super().get_queryset().filter(user=self.request.user)
         final_query = queryset.filter(orderitem__isnull=False).distinct()
         return final_query
@@ -274,4 +282,3 @@ class RoomBookList(viewsets.ModelViewSet):
             final_list.append(json_obj)
 
         return JsonResponse({"data": final_list})
-

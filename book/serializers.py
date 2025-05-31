@@ -25,7 +25,8 @@ class BookEventSerializer(serializers.ModelSerializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        exclude = ('is_deleted', 'deleted_at', 'created_at', 'updated_at')
+        fields = "__all__"
+        # exclude = ('is_deleted', 'deleted_at', 'created_at', 'updated_at')
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
