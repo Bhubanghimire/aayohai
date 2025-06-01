@@ -215,7 +215,6 @@ class BookEventList(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset().filter(user=self.request.user)
-        print(queryset)
         final_query = queryset.filter(eventitem__isnull=False).distinct()
         return final_query
 
