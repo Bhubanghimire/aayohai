@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from book.models import Cart, Book, OrderItem, BookItem
+from book.models import Cart, Book, OrderItem, BookItem, EventItem
+from events.serializers import EventSerializers
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
 from room.serializers import RoomSearchSerializer
@@ -42,4 +43,15 @@ class BookItemSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['room'] = RoomSearchSerializer(instance.room).data
+        return rep
+
+
+class EventItemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventItem
+        exclude = ('created_at', 'updated_at')
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['event'] = EventSerializers(instance.event).data
         return rep
