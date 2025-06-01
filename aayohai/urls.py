@@ -23,9 +23,9 @@ from accounts.urls import account_router
 from accounts.views import Homepage
 from book.normal_user.urls import book_router
 from events.normal_user.urls import event_router
+from payment.normal_user.urls import payment_router
 from system.urls import choice_router
 from room.normal_user.urls import room_router
-from payment.urls import payment_router
 from grocery.normal_user.urls import grocery_router
 
 

@@ -13,6 +13,10 @@ class EventPriceSerializer(serializers.ModelSerializer):
         model = EventPrice
         fields = ("id", "price", "title", "available_ticket", "limit")
 
+class EventPriceDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = EventPrice
+        fields =  ("id", "price", "title")
 
 class EventSerializers(serializers.ModelSerializer):
     class Meta:

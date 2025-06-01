@@ -71,6 +71,14 @@ class CartViewSet(viewsets.ModelViewSet):
         }, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
+        data = request.data
+        check_exists = Cart.objects.filter(user=request.user, grocery_id=data['grocery'])
+        if check_exists.exists():
+            check_exists.update(quantity=data['quantity'])
+            return Response({
+                'message': 'Item updated to cart successfully.',
+            }, status=200)
+
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
