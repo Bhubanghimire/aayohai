@@ -120,7 +120,7 @@ class StripeSession(viewsets.ModelViewSet):
         currency = data.get('currency', 'aud')
         ids = data.get('object_ids', [])
         table_object = data.get('object')
-
+        print(table_object)
         book_obj = Book.objects.create(user=request.user, status_id=1)
 
         total_amount = 0
@@ -137,6 +137,7 @@ class StripeSession(viewsets.ModelViewSet):
                 total_amount += event_price.price * event['count']
                 EventItem.objects.create(book=book_obj, event_id=event['event_id'], price=event_price.price,
                                          count=event['count'],
+                                         event_price=event_price,
                                          total_amount=event_price.price * event['count'])
         elif table_object == "Grocery":
             for grocery in ids:
