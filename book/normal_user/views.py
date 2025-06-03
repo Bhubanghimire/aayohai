@@ -103,7 +103,7 @@ class CartViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response({
             'message': 'Cart item deleted successfully.'
-        }, status=status.HTTP_204_NO_CONTENT)
+        }, status=200)
 
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
