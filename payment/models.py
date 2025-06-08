@@ -1,4 +1,3 @@
-
 from django.db import models
 
 from accounts.models import User
@@ -15,13 +14,13 @@ class Invoice(SoftDeletable):
     invoice_number = models.IntegerField(unique=True, auto_created=True, validators=[
         MinValueValidator(1000),
         MaxValueValidator(99999999)], )
-    total_amount = models.DecimalField(max_digits=17, decimal_places=2)
+    total_amount = models.IntegerField()
     invoice_date = models.DateField(auto_now_add=True)
-    discount = models.DecimalField(max_digits=17, decimal_places=2, default=0.0)
+    discount = models.IntegerField()
     billing_address = models.CharField(max_length=250)
     reference_id = models.CharField(max_length=250)
     payment_status = models.TextField()
-    invoice_amount = models.DecimalField(max_digits=17, decimal_places=2)
+    invoice_amount = models.IntegerField()
 
     def __str__(self):
         return str(self.invoice_number)
@@ -31,7 +30,7 @@ class Ticket(models.Model):
     user = models.ForeignKey(User, on_delete=models.RESTRICT)
     event = models.ForeignKey(Event, on_delete=models.RESTRICT)
     event_price = models.ForeignKey(EventPrice, on_delete=models.RESTRICT)
-    invoice = models.ForeignKey(Invoice,on_delete=models.RESTRICT)
+    invoice = models.ForeignKey(Invoice, on_delete=models.RESTRICT)
     ticket_number = models.CharField(max_length=255, default="No Ticket")
     ticket_bought = models.BooleanField(default=False)
     ticket_img = models.ImageField(upload_to="ticket", default="ticket/ticket_pic.png")
