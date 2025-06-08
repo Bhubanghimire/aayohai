@@ -16,7 +16,7 @@ class Invoice(SoftDeletable):
         MaxValueValidator(99999999)], )
     total_amount = models.IntegerField()
     invoice_date = models.DateField(auto_now_add=True)
-    discount = models.IntegerField()
+    discount = models.IntegerField(default=0)
     billing_address = models.CharField(max_length=250)
     reference_id = models.CharField(max_length=250)
     payment_status = models.TextField()
