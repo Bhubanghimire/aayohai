@@ -15,7 +15,7 @@ class ReviewAdmin(admin.ModelAdmin):
 
 @admin.register(Gallery)
 class GalleryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'room',  'created_at')
+    list_display = ('id', 'room', 'created_at')
 
 
 @admin.register(Amenities)
@@ -30,4 +30,4 @@ class LocationAdmin(admin.ModelAdmin):
 
 @admin.register(State)
 class StateAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'created_at')
+    list_display = ('id', 'name', 'country', 'created_at')
