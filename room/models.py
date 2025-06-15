@@ -53,7 +53,7 @@ class Room(SoftDeletable):
     category = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT,null=True, related_name="room_type")
     location = models.ForeignKey(Location, on_delete=models.PROTECT)
     furnishing = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT, null=True)
-    price = models.FloatField()
+    price = models.IntegerField()
     inspection_price = models.IntegerField(default=10)
     added_by = models.ForeignKey(User, on_delete=models.PROTECT)
 
