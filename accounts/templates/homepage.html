@@ -1,46 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Coming Soon</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+{% extends 'base.html' %}
 
-    body {
-      height: 100vh;
-      background: linear-gradient(to right, #1e3c72, #2a5298);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: white;
-      text-align: center;
-    }
+{% block style %}
+.hero {
+    background: #e5edff;
+    padding: 5rem 2rem;
+    text-align: center;
+}
 
-    .container {
-      max-width: 600px;
-      padding: 20px;
-    }
+.hero h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #2563eb;
+    margin-bottom: 1rem;
+}
 
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 20px;
-    }
+.hero p {
+    font-size: 1.2rem;
+    color: #444;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
 
-    p {
-      font-size: 1.2rem;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🚧 Coming Soon</h1>
-    <p>We are working hard to launch our new website.<br>Stay tuned!</p>
-  </div>
-</body>
-</html>
+.download-btn {
+    background-color: #2563eb;
+    color: #fff;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.download-btn:hover {
+    background-color: #1e4fd1;
+}
+{% endblock style %}
+
+{% block content %}
+<section class="hero">
+    <h1>AayoHai is here!</h1>
+    <p>Your one-stop app for rentals, event tickets, and grocery delivery.</p>
+    <a href="#" class="download-btn">Download for iOS</a>
+</section>
+{% endblock content %}

@@ -43,6 +43,15 @@ User = get_user_model()
 class Homepage(TemplateView):
     template_name = "homepage.html"
 
+class About(TemplateView):
+    template_name = "about.html"
+
+class Privacy(TemplateView):
+    template_name = "privacy.html"
+
+class Contact(TemplateView):
+    template_name = "contact.html"
+
 class AuthViewSet(viewsets.ViewSet):
     permission_classes_by_action = {
         'refresh': [IsAuthenticated],

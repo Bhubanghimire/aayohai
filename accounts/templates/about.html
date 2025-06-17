@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block style %}
+h1, h2 {
+    color: #2563eb;
+}
+section {
+    margin-bottom: 2.5rem;
+}
+.team {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    justify-content: center;
+}
+.member {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    width: 200px;
+}
+.member img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-bottom: 0.5rem;
+}
+{% endblock style %}
+
+{% block content %}
+<h1>About Us</h1>
+
+<section>
+    <p><strong>Aayohai</strong> is a one-stop mobile commerce platform designed to simplify your lifestyle. Whether you’re booking a hotel room, grabbing a ticket to an upcoming concert, or getting groceries delivered to your door, we bring all these services into one seamless app.</p>
+</section>
+
+<section>
+    <h2>What We Offer</h2>
+    <ul>
+        <li><strong>Room Booking:</strong> Browse and reserve accommodations in real-time.</li>
+        <li><strong>Event Ticketing:</strong> Discover events and book your spot effortlessly.</li>
+        <li><strong>Grocery Shopping:</strong> Order essential items and get them delivered quickly.</li>
+        <li><strong>Secure Payments:</strong> All transactions are powered by Stripe for fast and safe checkout.</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Our Mission</h2>
+    <p>To provide a fast, secure, and reliable mobile-first platform that empowers users across Nepal to access essential services with just a few taps.</p>
+</section>
+
+<section>
+    <h2>Meet Our Team</h2>
+    <div class="team">
+        <div class="member">
+            <img src="https://img.freepik.com/premium-vector/vector-flat-man-avatar-no-face-with-hairstyle_574806-4754.jpg" alt="John Doe">
+            <h4>Niraj Niraula</h4>
+            <p>CEO</p>
+        </div>
+
+    </div>
+</section>
+
+<section>
+    <h2>Why Choose Us?</h2>
+    <ul>
+        <li>Local expertise and nationwide coverage</li>
+        <li>Mobile-first design for ease of use</li>
+        <li>Fast, secure, and user-friendly experience</li>
+        <li>Dedicated customer support team</li>
+    </ul>
+</section>
+
+<section>
+    <h2>Contact Us</h2>
+    <p><strong>Email:</strong> support@aayohai.com</p>
+    <p><strong>Phone:</strong> +977-XXXXXXXXXX</p>
+</section>
+{% endblock content %}
