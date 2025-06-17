@@ -31,3 +31,31 @@ class GroceryDashboardViewSet(viewsets.ModelViewSet):
         serializer = ConfigChoiceSerializer(ad_list, context={"request": request}, many=True).data
         return Response({'data': serializer, 'message': 'Data Fetched.'})
 
+
+class RoomSearchViewSet(viewsets.ModelViewSet):
+    queryset = Grocery.objects.all()
+    serializer_class = GrocerySerializers
+
+    # permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        search = self.request.query_params.get('search', None)
+        category = self.request.query_params.get('category', None)
+        # furnishing = self.request.query_params.get('furnishing', None)
+        # location = self.request.query_params.get('location', None)
+
+        if search:
+            queryset = queryset.filter(name__icontains=search)
+
+        if category:
+            queryset = queryset.filter(category=category)
+
+        # if furnishing:
+        #     queryset = queryset.filter(furnishing=furnishing)
+        #
+        # if location:
+        #     loc = Location.objects.filter(state_id=location)
+        #     queryset = queryset.filter(location__in=loc)
+
+        return queryset
