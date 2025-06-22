@@ -88,3 +88,22 @@ class Advertise(models.Model):
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+
+class About(models.Model):
+    name = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to='about/')
+    email = models.EmailField()
+    phone = models.CharField(max_length=100)
+    facebook = models.CharField(max_length=100)
+    instagram = models.CharField(max_length=100)
+    tiktok = models.CharField(max_length=100)
+    users = models.IntegerField()
+    bookings = models.IntegerField()
+    partners = models.IntegerField()
+    app_rating = models.FloatField()
+    android_link = models.CharField(max_length=100)
+    ios_link = models.CharField(max_length=100)
+    address = models.CharField(max_length=100)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

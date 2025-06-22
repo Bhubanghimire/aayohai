@@ -28,7 +28,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from accounts.middleware import generate_access_token, generate_refresh_token, generate_otp
-from accounts.models import OTP, Advertise
+from accounts.models import OTP, Advertise, About
 from accounts.serializers import UserSerializers, AdvertiseSerializer, UserUpdateSerializer
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
@@ -43,14 +43,25 @@ User = get_user_model()
 class Homepage(TemplateView):
     template_name = "homepage.html"
 
-class About(TemplateView):
-    template_name = "about.html"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] =About.objects.first()
+        return context
+
+# class About(TemplateView):
+#     template_name = "about.html"
 
 class Privacy(TemplateView):
     template_name = "privacy.html"
 
-class Contact(TemplateView):
-    template_name = "contact.html"
+
+class Terms(TemplateView):
+    template_name = "terms.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] =About.objects.only("email", "phone").first()
+        return context
 
 class AuthViewSet(viewsets.ViewSet):
     permission_classes_by_action = {

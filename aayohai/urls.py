@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 from accounts.urls import account_router
-from accounts.views import Homepage, About, Privacy, Contact
+from accounts.views import Homepage, About, Privacy, Terms
 from book.normal_user.urls import book_router
 from events.normal_user.urls import event_router
 from payment.normal_user.urls import payment_router
@@ -32,9 +32,9 @@ from grocery.normal_user.urls import grocery_router
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", Homepage.as_view(), name="home"),
-    path("about", About.as_view(), name="about"),
+    # path("about", About.as_view(), name="about"),
     path("privacy", Privacy.as_view(), name="privacy"),
-    path("contact", Contact.as_view(), name="contact"),
+    path("terms", Terms.as_view(), name="terms"),
     path("api/", include((account_router.urls, 'accounts'), namespace='accounts')),
     path("api/type/", include((choice_router.urls, 'system'), namespace='system')),
     path("api/room/", include((room_router.urls, 'room'), namespace='room')),
