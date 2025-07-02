@@ -112,14 +112,17 @@ class AuthViewSet(viewsets.ViewSet):
     def login(self, request):
         password = request.data.get('password', False)
         email = request.data.get('email', False)
+        print(email, password)
 
         if not (email or password):
             raise serializers.ValidationError(
                 {"message": "Enter Email and password"}
             )
 
-        user = authenticate(request, email=email, password=password)
-        print(user)
+        # user = authenticate(request, email=email, password=password)
+        user = User.objects.get(email=email)
+        is_correct = check_password(password, user.password)
+        print(user, is_correct)
         if user is None:
             raise serializers.ValidationError(
                 {"message": "A user with this email and password was not found."}
@@ -179,6 +182,9 @@ class AuthViewSet(viewsets.ViewSet):
         user_serializer.save()
         check_otp.delete()
         user = User.objects.get(id=user_serializer.data["id"])
+        # user.set_password(data['password'])
+        user.user_type_id = 2
+        user.save()
         access_token = generate_access_token(user)
         refresh_token = generate_refresh_token(user)
 
