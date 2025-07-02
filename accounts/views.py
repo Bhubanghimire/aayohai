@@ -267,7 +267,7 @@ class ProfileViewSet(viewsets.ViewSet):
     def list(self, request):
         user = self.request.user
         serializer = UserSerializers(user).data
-        serializer.pop('password')
+        # serializer.pop('password')
         return Response({'data': serializer, 'message': 'Data Fetched.'})
 
     def put(self, request):
