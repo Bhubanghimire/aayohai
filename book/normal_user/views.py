@@ -120,7 +120,6 @@ class StripeSession(viewsets.ModelViewSet):
         currency = data.get('currency', 'aud')
         ids = data.get('object_ids', [])
         table_object = data.get('object')
-        print(table_object)
         book_obj = Book.objects.create(user=request.user, status_id=1)
 
         total_amount = 0
@@ -152,14 +151,21 @@ class StripeSession(viewsets.ModelViewSet):
             invoice_number = 1000
         Invoice.objects.create(book=book_obj, invoice_amount=total_amount, invoice_number=invoice_number,
                                total_amount=total_amount)
-
         intent = stripe.PaymentIntent.create(
             amount=int(total_amount * 100),
             currency=currency,
             metadata={'integration_check': 'accept_a_payment'},
         )
+
+        # try:
+        #     intent = stripe.PaymentIntent.retrieve(intent.id)
+        #     print("Status:", intent.status)
+        #     print("Amount:", intent.amount)
+        #     print("Currency:", intent.currency)
+        # except stripe.error.InvalidRequestError as e:
+        #     print("Error:", e)
         return Response({
-            'clientSecret': intent.client_secret,
+            'clientSecret': intent.id,
             "book_id": book_obj.uuid,
         })
 
