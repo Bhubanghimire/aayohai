@@ -5,6 +5,15 @@ from system.models import ConfigChoice, SoftDeletable
 
 
 # Create your models here.
+class GroceryCategory(models.Model):
+    name = models.CharField(max_length=100)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
 class Grocery(SoftDeletable):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -12,7 +21,7 @@ class Grocery(SoftDeletable):
     quantity = models.PositiveIntegerField()
     quantity_unit = models.ForeignKey(ConfigChoice, on_delete=models.CASCADE, related_name="quantity_unit")
     price = models.IntegerField()
-    category = models.ForeignKey(ConfigChoice, on_delete=models.CASCADE)
+    category = models.ForeignKey(GroceryCategory, on_delete=models.SET_NULL,null=True, blank=True)
     added_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
