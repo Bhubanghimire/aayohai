@@ -47,7 +47,7 @@ from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from tutorial.quickstart.serializers import UserSerializer
 
-from aayohai.settings import HOST_URL
+from aayohai.settings import HOST_URL, STRIPE_SECRET_KEY
 from room.models import Room, State, Location, Gallery, Amenities
 from room.serializers import RoomSerializers, StateSerializer, RoomDetailSerializer, RoomSearchSerializer, \
     RoomCreateSerializer, AmenitiesSerializer
@@ -106,7 +106,7 @@ class CartViewSet(viewsets.ModelViewSet):
         }, status=200)
 
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
+
 
 
 class StripeSession(viewsets.ModelViewSet):
@@ -151,8 +151,10 @@ class StripeSession(viewsets.ModelViewSet):
             invoice_number = 1000
         Invoice.objects.create(book=book_obj, invoice_amount=total_amount, invoice_number=invoice_number,
                                total_amount=total_amount)
+
+        stripe.api_key = settings.STRIPE_SECRET_KEY
         intent = stripe.PaymentIntent.create(
-            amount=int(total_amount * 100),
+            amount=total_amount,
             currency=currency,
             metadata={'integration_check': 'accept_a_payment'},
         )
@@ -169,7 +171,7 @@ class StripeSession(viewsets.ModelViewSet):
                     "amount": intent_status.amount,
                     "currency": intent_status.currency
                 },
-                "book_id": book_obj.uuid,
+                # "book_id": book_obj.uuid,
             })
         except stripe.error.InvalidRequestError as e:
             print("Error:", e)
