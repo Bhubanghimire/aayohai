@@ -171,7 +171,7 @@ class StripeSession(viewsets.ModelViewSet):
                     "amount": intent_status.amount,
                     "currency": intent_status.currency
                 },
-                # "book_id": book_obj.uuid,
+                "book_id": book_obj.uuid,
             })
         except stripe.error.InvalidRequestError as e:
             print("Error:", e)
