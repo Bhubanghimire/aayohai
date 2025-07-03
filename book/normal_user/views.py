@@ -157,17 +157,25 @@ class StripeSession(viewsets.ModelViewSet):
             metadata={'integration_check': 'accept_a_payment'},
         )
 
-        # try:
-        #     intent = stripe.PaymentIntent.retrieve(intent.id)
-        #     print("Status:", intent.status)
-        #     print("Amount:", intent.amount)
-        #     print("Currency:", intent.currency)
-        # except stripe.error.InvalidRequestError as e:
-        #     print("Error:", e)
-        return Response({
-            'clientSecret': intent.id,
-            "book_id": book_obj.uuid,
-        })
+        try:
+            intent_status = stripe.PaymentIntent.retrieve(intent.client_secret.split('_secret')[0])
+            print("Status:", intent_status.status)
+            print("Amount:", intent_status.amount)
+            print("Currency:", intent_status.currency)
+            return Response({
+                'clientSecret': intent.client_secret,
+                "status": {
+                    "status": intent_status.status,
+                    "amount": intent_status.amount,
+                    "currency": intent_status.currency
+                },
+                "book_id": book_obj.uuid,
+            })
+        except stripe.error.InvalidRequestError as e:
+            print("Error:", e)
+            return Response({"error": str(e)}, status=400)
+
+
 
     @action(detail=False, methods=['post'])
     def update_status(self, request):
