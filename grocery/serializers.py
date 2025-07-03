@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from grocery.models import Grocery
+from grocery.models import Grocery, GroceryCategory
 
 
 class GrocerySerializers(serializers.ModelSerializer):
@@ -13,3 +13,8 @@ class GrocerySerializers(serializers.ModelSerializer):
         rep['quantity_unit'] = str(instance.quantity_unit.name)
         # self.fields['review'] = UserSerializers(read_only=True)
         return rep
+
+class GroceryCategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroceryCategory
+        fields = ['id', 'name', 'image', 'description']

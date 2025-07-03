@@ -1,8 +1,8 @@
 from rest_framework.decorators import action
 from accounts.models import Advertise
 from accounts.serializers import AdvertiseSerializer
-from grocery.models import Grocery
-from grocery.serializers import GrocerySerializers
+from grocery.models import Grocery, GroceryCategory
+from grocery.serializers import GrocerySerializers, GroceryCategorySerializer
 from rest_framework import serializers, viewsets, status
 from rest_framework.response import Response
 
@@ -27,8 +27,8 @@ class GroceryDashboardViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['GET'], url_path='category-list')
     def category(self, request):
-        ad_list = ConfigChoice.objects.filter(status=True, category__name='grocery_category')
-        serializer = ConfigChoiceSerializer(ad_list, context={"request": request}, many=True).data
+        cat_list = GroceryCategory.objects.filter(status=True)
+        serializer = GroceryCategorySerializer(cat_list, context={"request": request}, many=True).data
         return Response({'data': serializer, 'message': 'Data Fetched.'})
 
 

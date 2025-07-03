@@ -63,7 +63,7 @@ class CartViewSet(viewsets.ModelViewSet):
     serializer_class = GartSerializers
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
+        queryset = self.get_queryset().filter(user=self.request.user)
         serializer = self.get_serializer(queryset, many=True)
         return Response({
             'message': 'Cart list fetched successfully.',
