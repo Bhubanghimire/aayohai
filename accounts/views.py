@@ -279,7 +279,7 @@ class ProfileViewSet(viewsets.ViewSet):
             user.profile = profile
             user.save()
 
-        required_fields = ['first_name', 'last_name', 'birth_date', 'gender']
+        required_fields = ['first_name', 'last_name']
         missing_fields = [field for field in required_fields if
                           field not in request.data or request.data[field] in [None, '']]
 
