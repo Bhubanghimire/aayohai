@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 
 from accounts.urls import account_router
-from accounts.views import Homepage, About, Privacy, Terms
+from accounts.views import Homepage, About, Privacy, Terms, Dashboard
 from book.normal_user.urls import book_router
 from events.normal_user.urls import event_router
 from payment.normal_user.urls import payment_router
@@ -42,4 +42,5 @@ urlpatterns = [
     path("api/grocery/", include((grocery_router.urls, 'grocery'), namespace='grocery')),
     path("api/book/", include((book_router.urls, 'book'), namespace='book')),
     path("api/event/", include((event_router.urls, 'events'), namespace='events')),
+    path("dashboard/", Dashboard.as_view(), name="dashboard"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

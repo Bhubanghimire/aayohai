@@ -54,6 +54,9 @@ class Homepage(TemplateView):
 class Privacy(TemplateView):
     template_name = "privacy.html"
 
+class Dashboard(TemplateView):
+    template_name = "dashboard.html"
+
 
 class Terms(TemplateView):
     template_name = "terms.html"
