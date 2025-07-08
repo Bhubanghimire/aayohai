@@ -298,3 +298,35 @@ class ProfileViewSet(viewsets.ViewSet):
 
     # def retrieve(self, request, pk=None):
     #     # Not using pk, returning the authenticated user
+
+
+class ChatViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
+
+    @action(detail=False, url_path='(?P<room_id>[^/.]+)/history')
+    def history(self, request, room_id=None):
+
+        chat_url = os.path.join(settings.MEDIA_ROOT, 'chat_log', f'chat_{room_id}')
+
+
+        def extract_datetime(filename):
+            # Remove extension
+            name_part = filename.replace('.txt', '')
+            # Parse to datetime
+            dt = datetime.strptime(name_part, "%Y-%m-%d-%H-%M-%S-%f")
+            return dt
+
+        if os.path.exists(chat_url):
+            chat_list = os.listdir(chat_url)
+            sorted_files = sorted(
+                chat_list,
+                key=extract_datetime
+            )
+        else:
+            sorted_files = []
+
+        return Response({
+            'data': sorted_files,
+            # 'some_id': some_id,
+            'message': 'Data Fetched with arg.'
+        })
