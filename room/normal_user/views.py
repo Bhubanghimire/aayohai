@@ -95,6 +95,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         location = Location.objects.create(state=state, **location_data)
         data['location'] = location.pk
         data['added_by'] = request.user.id
+        data['status'] = 16  # Assuming '1' is the default status ID
         request.data._mutable = False
 
         serializer = RoomCreateSerializer(data=data)

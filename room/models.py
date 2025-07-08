@@ -50,6 +50,7 @@ class Room(SoftDeletable):
     length = models.IntegerField()
     breadth = models.IntegerField()
     amenities = models.ManyToManyField(Amenities)
+    status = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT, null=True, related_name="room_status")
     category = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT,null=True, related_name="room_type")
     location = models.ForeignKey(Location, on_delete=models.PROTECT)
     furnishing = models.ForeignKey(ConfigChoice, on_delete=models.PROTECT, null=True)
