@@ -120,10 +120,11 @@ class StripeSession(viewsets.ModelViewSet):
         currency = data.get('currency', 'aud')
         ids = data.get('object_ids', [])
         table_object = data.get('object')
-        book_obj = Book.objects.create(user=request.user, status_id=1)
+        
 
         total_amount = 0
         if table_object == "Room":
+            book_obj = Book.objects.create(user=request.user, status_id=17)
             for room_id in ids:
                 room_obj = Room.objects.filter(pk=room_id).first()
                 total_amount += room_obj.price
@@ -131,6 +132,7 @@ class StripeSession(viewsets.ModelViewSet):
                                         total_amount=room_obj.price)
 
         elif table_object == "Event":
+            book_obj = Book.objects.create(user=request.user, status_id=19)
             for event in ids:
                 event_price = EventPrice.objects.get(id=event['price_id'])
                 total_amount += event_price.price * event['count']
@@ -139,6 +141,7 @@ class StripeSession(viewsets.ModelViewSet):
                                          event_price=event_price,
                                          total_amount=event_price.price * event['count'])
         elif table_object == "Grocery":
+            book_obj = Book.objects.create(user=request.user, status_id=21)
             for grocery in ids:
                 total_amount += grocery["price"]
                 OrderItem.objects.create(book=book_obj, grocery_id=grocery['id'], price=grocery["price"],
@@ -187,7 +190,14 @@ class StripeSession(viewsets.ModelViewSet):
         reference_id = data.get('reference_id')
         Invoice.objects.filter(book=book).update(payment_status=payment_complete, reference_id=reference_id)
         event_items = EventItem.objects.filter(book=book)
+        room_items = BookItem.objects.filter(book=book)
+        if room_items.exists():
+            room_ids = room_items.values_list('room_id', flat=True)
+            Room.objects.filter(id__in=room_ids).update(status_id=18)
+
         if event_items.exists():
+            event_ids = event_items.values_list('event_id', flat=True)
+            Event.objects.filter(id__in=event_ids).update(status_id=20)
             event = event_items.first().event
             for event_rate in event_items:
                 price = event_rate.event_price

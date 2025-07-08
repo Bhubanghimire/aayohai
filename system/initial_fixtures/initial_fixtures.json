@@ -54,6 +54,24 @@
             "created_at": "2024-05-03T06:41:11.567Z"
         }
     },
+    {
+        "model": "system.ConfigCategory",
+        "pk": 7,
+        "fields": {
+            "name": "event_book_status",
+            "description": "this is the depth 1 of test area.",
+            "created_at": "2024-05-03T06:41:11.567Z"
+        }
+    },
+    {
+        "model": "system.ConfigCategory",
+        "pk": 8,
+        "fields": {
+            "name": "grocery_book_status",
+            "description": "this is the depth 1 of test area.",
+            "created_at": "2024-05-03T06:41:11.567Z"
+        }
+    },
 
     {
         "model": "system.ConfigChoice",
@@ -267,6 +285,78 @@
         "fields": {
             "name": "Sold",
             "category_id": 6,
+            "image": null,
+            "status": true,
+            "description": "This is for video upload category.",
+            "created_at": "2024-05-03T06:41:11.567Z"
+        }
+    },
+    {
+        "model": "system.ConfigChoice",
+        "pk": 19,
+        "fields": {
+            "name": "Pending",
+            "category_id": 7,
+            "image": null,
+            "status": true,
+            "description": "This is for video upload category.",
+            "created_at": "2024-05-03T06:41:11.567Z"
+        }
+    },
+    {
+        "model": "system.ConfigChoice",
+        "pk": 20,
+        "fields": {
+            "name": "Paid",
+            "category_id": 7,
+            "image": null,
+            "status": true,
+            "description": "This is for video upload category.",
+            "created_at": "2024-05-03T06:41:11.567Z"
+        }
+    },
+    {
+        "model": "system.ConfigChoice",
+        "pk": 21,
+        "fields": {
+            "name": "Pending",
+            "category_id": 8,
+            "image": null,
+            "status": true,
+            "description": "This is for video upload category.",
+            "created_at": "2024-05-03T06:41:11.567Z"
+        }
+    },
+    {
+        "model": "system.ConfigChoice",
+        "pk": 22,
+        "fields": {
+            "name": "On The Way",
+            "category_id": 8,
+            "image": null,
+            "status": true,
+            "description": "This is for video upload category.",
+            "created_at": "2024-05-03T06:41:11.567Z"
+        }
+    },
+    {
+        "model": "system.ConfigChoice",
+        "pk": 23,
+        "fields": {
+            "name": "Delivered.",
+            "category_id": 8,
+            "image": null,
+            "status": true,
+            "description": "This is for video upload category.",
+            "created_at": "2024-05-03T06:41:11.567Z"
+        }
+    },
+    {
+        "model": "system.ConfigChoice",
+        "pk": 24,
+        "fields": {
+            "name": "Cancelled",
+            "category_id": 8,
             "image": null,
             "status": true,
             "description": "This is for video upload category.",
