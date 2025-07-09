@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block sidebar %}
+{% load static %}
+{% load i18n %}
+<!-- ========== App Menu ========== -->
+<div class="app-menu navbar-menu">
+    <!-- LOGO -->
+    <div class="navbar-brand-box">
+        <!-- Dark Logo-->
+        <a href="" class="logo logo-dark">
+            <span class="logo-sm">
+                <img src="url" alt="url">
+            </span>
+            <span class="logo-lg">
+                <img src="{{ user.Center_Code.get_logo_url }}" alt="{{ user.Center_Code.Center_Name }}">
+            </span>
+        </a>
+        <!-- Light Logo-->
+        <a href="" class="logo logo-light">
+            <span class="logo-sm">
+                <img src="{{ user.Center_Code.get_logo_url }}" alt="{{ user.Center_Code.Center_Name }}"">
+            </span>
+            <span class="logo-lg">
+                <img src="{{ user.Center_Code.get_logo_url }}" alt="{{ user.Center_Code.Center_Name }}">
+            </span>
+        </a>
+        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
+            <i class="ri-record-circle-line"></i>
+        </button>
+    </div>
+    <div id="scrollbar">
+        <div class="container-fluid">
+            <div id="two-column-menu">
+            </div>
+            <ul class="navbar-nav" id="navbar-nav">
+                {% comment %} <li class="menu-title"><span data-key="t-menu">Menu</span></li> {% endcomment %}
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="" data-menu_id="dashboard">
+                        <i class="ri-dashboard-2-line"></i> <span data-key="t-widgets">{% trans 'Dashboard' %}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarMembers" data-menu_id="members" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarMembers">
+                        <i class="ri-team-fill"></i> <span data-key="t-members">{% trans 'Members' %}</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarMembers">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-members_list" data-menu_id="members_list"> {% trans 'Members List' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-department_list" data-menu_id="department_list"> {% trans 'Department List' %} </a>
+                            </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link" href="" data-key="t-agreement_management"  data-menu_id="agreement_management">
+                                        {% trans 'Agreement Settings' %}
+                                    </a>
+                                </li>
+                            {% if request.user.Center_Code.enable_agreement %}
+                                <li class="nav-item">
+                                <a class="nav-link" href="" data-key="t-contract_management"  data-menu_id="contract_management">
+                                    {% trans 'Contract Management' %}
+                                </a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </li> <!-- end Members Menu -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarClassroom" data-menu_id="classroom" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarClassroom">
+                        <i class="ri-pages-line"></i> <span data-key="t-classroom">{% trans 'Classroom' %}</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarClassroom">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-course" data-menu_id="course"> {% trans 'Course' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-assignemnt" data-menu_id="assignment"> {% trans 'Assignment' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-quiz" data-menu_id="quiz"> {% trans 'Quiz' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-attendance" data-menu_id="attendence"> {% trans 'Attendance' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-grade_book" data-menu_id="grade_book"> {% trans 'Grade Book' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-course_evaluation" data-menu_id="course_evaluation"> {% trans 'Course Evaluation' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li> <!-- end Classroom Menu -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarProgramManagement" data-menu_id="program_management" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarProgramManagement">
+                        <i class=" ri-function-fill"></i> <span data-key="t-program_management">{% trans 'Program Management' %}</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarProgramManagement">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-session_list" data-menu_id="session_list"> {% trans 'Session List' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-student_group" data-menu_id="student_group"> {% trans 'Student Group' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-teacher_course_allocation" data-menu_id="teacher_course_alloation"> {% trans 'Teacher Course Allocation' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-student_application" data-menu_id="student_application"> {% trans 'Student Application' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li> <!-- end Program Management Menu -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarBoard" data-menu_id="board" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarBoard">
+                        <i class="ri-artboard-fill"></i> <span data-key="t-board">{% trans 'Board' %}</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarBoard">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-notice_board" data-menu_id="notice_board"> {% trans 'Notice Board' %} </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="" class="nav-link" data-key="t-forum" data-menu_id="forum"> {% trans 'Forum' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li> <!-- end Board Menu -->
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="" data-menu_id="survey">
+                        <i class="ri-survey-fill"></i> <span data-key="t-survey" >{% trans 'Survey' %}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="" data-menu_id="calendar">
+                        <i class="ri-calendar-2-fill"></i> <span data-key="t-calendar" >{% trans 'Calendar' %}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="" data-menu_id="teacher_report">
+                        <i class="ri-bar-chart-box-line"></i> <span data-key="t-teacher_report" >{% trans 'Teacher Report' %}</span>
+                    </a>
+                </li>
+                {% if request.user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="" data-menu_id="Analytics">
+                        <i class="ri-dashboard-2-line"></i> <span data-key="t-widgets">{% trans 'Analytics' %}</span>
+                    </a>
+                </li>
+                {% endif %}
+            {% if user.is_superuser %}
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="" data-menu_id="CenterInfo">
+                        <i class="ri-hotel-line"></i> <span data-key="t-widgets">{% trans 'Center Info' %}</span>
+                    </a>
+                </li>
+            {% endif %}
+                {% if SHOW_SYNC_BUTTOM %}
+                    {% if request.user.Center_Code.sync_link is not None %}
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="" data-menu_id="Indo Sync">
+                        <i class="ri-dashboard-2-line"></i> <span data-key="t-widgets">{% trans 'Indo Sync' %} {{ request.url }}</span>
+                    </a>
+                </li>
+                {% endif %}
+            {% endif %}
+            {% if request.user.Center_Code.Center_Name == 'UniLicungo' and request.user.Center_Code.id == 3 %}
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="http://197.249.65.29/unilicungo/opac_css/" data-menu_id="UniLicungo">
+                        <i class="bx bx-link"></i> <span data-key="t-UniLicungo">{% trans 'To Library' %}</span>
+                    </a>
+                </li>
+            {% endif %}
+            </ul>
+        </div>
+        <!-- Sidebar -->
+    </div>
+
+    <div class="sidebar-background"></div>
+</div>
+<!-- Left Sidebar End -->
+<!-- Vertical Overlay-->
+<div class="vertical-overlay"></div>
+{% endblock %}
