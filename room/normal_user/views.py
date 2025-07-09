@@ -45,7 +45,7 @@ class DashboardViewSet(viewsets.ModelViewSet):
     http_method_names = ['get']
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().exclude(status_id=18)  # Exclude rooms with status 'Sold'
         return queryset
 
     @action(methods=['get'], detail=False, url_path='nearby')
@@ -74,7 +74,7 @@ class RoomViewSet(viewsets.ModelViewSet):
     # permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().exclude(status_id=18)
         return queryset
 
     def create(self, request, *args, **kwargs):
@@ -95,6 +95,7 @@ class RoomViewSet(viewsets.ModelViewSet):
         location = Location.objects.create(state=state, **location_data)
         data['location'] = location.pk
         data['added_by'] = request.user.id
+        data['status'] = 16  # Assuming '1' is the default status ID
         request.data._mutable = False
 
         serializer = RoomCreateSerializer(data=data)
@@ -132,7 +133,7 @@ class RoomSearchViewSet(viewsets.ModelViewSet):
     # permission_classes = [AllowAny]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().exclude(status_id=18)  # Exclude rooms with status 'Sold'
         search = self.request.query_params.get('search', None)
         category = self.request.query_params.get('category', None)
         furnishing = self.request.query_params.get('furnishing', None)

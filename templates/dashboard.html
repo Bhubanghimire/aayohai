@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Multi-Service App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 260px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 70px;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 10px;
+            margin: 5px 0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0.3), transparent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item:hover::before {
+            width: 100%;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-right: 12px;
+            width: 25px;
+            text-align: center;
+        }
+
+        .nav-text {
+            flex: 1;
+            white-space: nowrap;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar.collapsed .nav-text {
+            opacity: 0;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: 20px;
+            right: -15px;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 25px;
+            border-radius: 20px;
+            color: white;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(45deg);
+            transition: all 0.3s ease;
+            opacity: 0;
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) scale(1.5);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+        }
+
+        /* Content Section */
+        .content-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Table Styles */
+        .table-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        th {
+            background: rgba(255, 255, 255, 0.1);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 12px;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin: 0 3px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #f44336, #da190b);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(45deg, #ff9800, #f57c00);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Status Badges */
+        .status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status.confirmed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+
+        .status.pending {
+            background: rgba(255, 152, 0, 0.2);
+            color: #ff9800;
+            border: 1px solid rgba(255, 152, 0, 0.3);
+        }
+
+        .status.cancelled {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: 1px solid rgba(244, 67, 54, 0.3);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .close {
+            color: white;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .close:hover {
+            transform: scale(1.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                z-index: 999;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            <div class="logo">Admin Panel</div>
+            <div class="nav-item active" onclick="showSection('dashboard')">
+                <span class="nav-icon">📊</span>
+                <span class="nav-text">Dashboard</span>
+            </div>
+            <div class="nav-item" onclick="showSection('rooms')">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Room Rentals</span>
+            </div>
+            <div class="nav-item" onclick="showSection('groceries')">
+                <span class="nav-icon">🛒</span>
+                <span class="nav-text">Grocery Orders</span>
+            </div>
+            <div class="nav-item" onclick="showSection('events')">
+                <span class="nav-icon">🎫</span>
+                <span class="nav-text">Event Tickets</span>
+            </div>
+            <div class="nav-item" onclick="showSection('users')">
+                <span class="nav-icon">👥</span>
+                <span class="nav-text">Users</span>
+            </div>
+            <div class="nav-item" onclick="showSection('settings')">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Settings</span>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="user-info">
+                    <span>Welcome, Admin</span>
+                    <div class="user-avatar">A</div>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">127</div>
+                        <div class="stat-label">Active Rooms</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">1,234</div>
+                        <div class="stat-label">Grocery Orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">856</div>
+                        <div class="stat-label">Event Tickets</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">2,891</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Room Rentals Section -->
+            <div id="rooms" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title">Room Rentals</h2>
+                    <button class="btn btn-primary" onclick="openModal('roomModal')">Add Room</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Room ID</th>
+                                <th>Property</th>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="roomsTable">
+                            <tr>
+                                <td>R001</td>
+                                <td>Sunset Apartments</td>
+                                <td>Studio</td>
+                                <td>$800/month</td>
+                                <td><span class="status confirmed">Available</span></td>
+                                <td>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-danger">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>R002</td>
+                                <td>Downtown Loft</td>
+                                <td>1 Bedroom</td>
+                                <td>$1,200/month</td>
+                                <td><span class="status pending">Rented</span></td>
+                                <td>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-danger">Delete</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>R003</td>
+                                <td>Garden View</td>
+                                <td>2 Bedroom</td>
+                                <td>$1,500/month</td>
+                                <td><span class="status cancelled">Maintenance</span></td>
+                                <td>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-danger">Delete</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Grocery Orders Section -->
+            <div id="groceries" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title">Grocery Orders</h2>
+                    <button class="btn btn-primary" onclick="openModal('groceryModal')">Add Order</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="groceriesTable">
+                            <tr>
+                                <td>G001</td>
+                                <td>John Doe</td>
+                                <td>Milk, Bread, Eggs</td>
+                                <td>$25.50</td>
+                                <td><span class="status confirmed">Delivered</span></td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>G002</td>
+                                <td>Jane Smith</td>
+                                <td>Vegetables, Fruits</td>
+                                <td>$45.20</td>
+                                <td><span class="status pending">Processing</span></td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>G003</td>
+                                <td>Bob Johnson</td>
+                                <td>Meat, Dairy</td>
+                                <td>$67.80</td>
+                                <td><span class="status cancelled">Cancelled</span></td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Event Tickets Section -->
+            <div id="events" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title">Event Tickets</h2>
+                    <button class="btn btn-primary" onclick="openModal('eventModal')">Add Event</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Event ID</th>
+                                <th>Event Name</th>
+                                <th>Date</th>
+                                <th>Tickets Sold</th>
+                                <th>Revenue</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="eventsTable">
+                            <tr>
+                                <td>E001</td>
+                                <td>Concert Night</td>
+                                <td>2025-07-15</td>
+                                <td>250/300</td>
+                                <td>$12,500</td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-danger">Cancel</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>E002</td>
+                                <td>Food Festival</td>
+                                <td>2025-07-20</td>
+                                <td>180/500</td>
+                                <td>$5,400</td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-danger">Cancel</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>E003</td>
+                                <td>Tech Conference</td>
+                                <td>2025-07-25</td>
+                                <td>95/150</td>
+                                <td>$9,500</td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-danger">Cancel</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="users" class="content-section">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 class="section-title">Users</h2>
+                    <button class="btn btn-primary" onclick="openModal('userModal')">Add User</button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Join Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTable">
+                            <tr>
+                                <td>U001</td>
+                                <td>John Doe</td>
+                                <td>john@example.com</td>
+                                <td>2025-01-15</td>
+                                <td><span class="status confirmed">Active</span></td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-danger">Suspend</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>U002</td>
+                                <td>Jane Smith</td>
+                                <td>jane@example.com</td>
+                                <td>2025-02-20</td>
+                                <td><span class="status confirmed">Active</span></td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-danger">Suspend</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>U003</td>
+                                <td>Bob Johnson</td>
+                                <td>bob@example.com</td>
+                                <td>2025-03-10</td>
+                                <td><span class="status cancelled">Suspended</span></td>
+                                <td>
+                                    <button class="btn btn-success">View</button>
+                                    <button class="btn btn-warning">Edit</button>
+                                    <button class="btn btn-success">Activate</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="content-section">
+                <h2 class="section-title">Settings</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div class="table-container" style="padding: 20px;">
+                        <h3 style="color: white; margin-bottom: 15px;">General Settings</h3>
+                        <div class="form-group">
+                            <label class="form-label">App Name</label>
+                            <input type="text" class="form-control" value="Multi-Service App">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Contact Email</label>
+                            <input type="email" class="form-control" value="admin@example.com">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Support Phone</label>
+                            <input type="tel" class="form-control" value="+1-234-567-8900">
+                        </div>
+                        <button class="btn btn-primary">Save Settings</button>
+                    </div>
+                    <div class="table-container" style="padding: 20px;">
+                        <h3 style="color: white; margin-bottom: 15px;">Commission Settings</h3>
+                        <div class="form-group">
+                            <label class="form-label">Room Rental Commission (%)</label>
+                            <input type="number" class="form-control" value="10">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Grocery Delivery Fee ($)</label>
+                            <input type="number" class="form-control" value="5">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Event Ticket Fee (%)</label>
+                            <input type="number" class="form-control" value="8">
+                        </div>
+                        <button class="btn btn-primary">Update Fees</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="roomModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('roomModal')">&times;</span>
+            <h2>Add New Room</h2>
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Property Name</label>
+                    <input type="text" class="form-control" placeholder="Enter property name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Room Type</label>
+                    <select class="form-control">
+                        <option>Studio</option>
+                        <option>1 Bedroom</option>
+                        <option>2 Bedroom</option>
+                        <option>3 Bedroom</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Monthly Rent</label>
+                    <input type="number" class="form-control" placeholder="Enter total amount">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Delivery Address</label>
+                    <textarea class="form-control" rows="3" placeholder="Enter delivery address"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Order</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="eventModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('eventModal')">&times;</span>
+            <h2>Add New Event</h2>
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Event Name</label>
+                    <input type="text" class="form-control" placeholder="Enter event name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Event Date</label>
+                    <input type="date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Venue</label>
+                    <input type="text" class="form-control" placeholder="Enter venue name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ticket Price</label>
+                    <input type="number" class="form-control" placeholder="Enter ticket price">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Total Tickets</label>
+                    <input type="number" class="form-control" placeholder="Enter total tickets available">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Event</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('userModal')">&times;</span>
+            <h2>Add New User</h2>
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" placeholder="Enter full name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-control" placeholder="Enter email address">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Phone</label>
+                    <input type="tel" class="form-control" placeholder="Enter phone number">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-control">
+                        <option>Customer</option>
+                        <option>Vendor</option>
+                        <option>Admin</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Add User</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Navigation functionality
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.content-section');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+
+            // Update navigation
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Update page title
+            const titles = {
+                'dashboard': 'Dashboard',
+                'rooms': 'Room Rentals',
+                'groceries': 'Grocery Orders',
+                'events': 'Event Tickets',
+                'users': 'Users',
+                'settings': 'Settings'
+            };
+            document.getElementById('pageTitle').textContent = titles[sectionId];
+        }
+
+        // Sidebar toggle functionality
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        // Modal functionality
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target == modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+        }
+
+        // Sample data management functions
+        const sampleData = {
+            rooms: [
+                { id: 'R001', property: 'Sunset Apartments', type: 'Studio', price: '$800/month', status: 'Available' },
+                { id: 'R002', property: 'Downtown Loft', type: '1 Bedroom', price: '$1,200/month', status: 'Rented' },
+                { id: 'R003', property: 'Garden View', type: '2 Bedroom', price: '$1,500/month', status: 'Maintenance' }
+            ],
+            groceries: [
+                { id: 'G001', customer: 'John Doe', items: 'Milk, Bread, Eggs', total: '$25.50', status: 'Delivered' },
+                { id: 'G002', customer: 'Jane Smith', items: 'Vegetables, Fruits', total: '$45.20', status: 'Processing' },
+                { id: 'G003', customer: 'Bob Johnson', items: 'Meat, Dairy', total: '$67.80', status: 'Cancelled' }
+            ],
+            events: [
+                { id: 'E001', name: 'Concert Night', date: '2025-07-15', tickets: '250/300', revenue: '$12,500' },
+                { id: 'E002', name: 'Food Festival', date: '2025-07-20', tickets: '180/500', revenue: '$5,400' },
+                { id: 'E003', name: 'Tech Conference', date: '2025-07-25', tickets: '95/150', revenue: '$9,500' }
+            ],
+            users: [
+                { id: 'U001', name: 'John Doe', email: 'john@example.com', joinDate: '2025-01-15', status: 'Active' },
+                { id: 'U002', name: 'Jane Smith', email: 'jane@example.com', joinDate: '2025-02-20', status: 'Active' },
+                { id: 'U003', name: 'Bob Johnson', email: 'bob@example.com', joinDate: '2025-03-10', status: 'Suspended' }
+            ]
+        };
+
+        // Form submission handlers
+        document.addEventListener('DOMContentLoaded', function() {
+            // Handle form submissions
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    // Get form data
+                    const formData = new FormData(this);
+                    const data = {};
+                    for (let [key, value] of formData.entries()) {
+                        data[key] = value;
+                    }
+
+                    // Show success message
+                    alert('Data saved successfully!');
+
+                    // Close modal
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+
+                    // Reset form
+                    this.reset();
+                });
+            });
+
+            // Add search functionality
+            addSearchFunctionality();
+
+            // Initialize charts and animations
+            initializeAnimations();
+        });
+
+        // Search functionality
+        function addSearchFunctionality() {
+            const tables = document.querySelectorAll('table');
+            tables.forEach(table => {
+                const searchInput = document.createElement('input');
+                searchInput.type = 'text';
+                searchInput.placeholder = 'Search...';
+                searchInput.className = 'form-control';
+                searchInput.style.marginBottom = '15px';
+                searchInput.style.maxWidth = '300px';
+
+                table.parentElement.insertBefore(searchInput, table);
+
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = table.querySelectorAll('tbody tr');
+
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        if (text.includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Initialize animations and interactive elements
+        function initializeAnimations() {
+            // Animate stat cards on load
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.animation = 'fadeIn 0.5s ease forwards';
+                }, index * 100);
+            });
+
+            // Add hover effects to table rows
+            const tableRows = document.querySelectorAll('tbody tr');
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.01)';
+                    this.style.transition = 'transform 0.2s ease';
+                });
+
+                row.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+
+            // Add ripple effect to buttons
+            const buttons = document.querySelectorAll('.btn');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.cssText = `
+                        position: absolute;
+                        width: ${size}px;
+                        height: ${size}px;
+                        left: ${x}px;
+                        top: ${y}px;
+                        background: rgba(255, 255, 255, 0.3);
+                        border-radius: 50%;
+                        transform: scale(0);
+                        animation: ripple 0.6s ease-out;
+                        pointer-events: none;
+                    `;
+
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+
+                    setTimeout(() => {
+                        ripple.remove();
+                    }, 600);
+                });
+            });
+        }
+
+        // Status update functions
+        function updateStatus(type, id, newStatus) {
+            const statusSpan = document.querySelector(`#${type}Table tr:has(td:first-child:contains('${id}')) .status`);
+            if (statusSpan) {
+                statusSpan.textContent = newStatus;
+                statusSpan.className = `status ${newStatus.toLowerCase()}`;
+            }
+        }
+
+        // Export functionality
+        function exportData(type) {
+            const table = document.querySelector(`#${type}Table`);
+            const rows = table.querySelectorAll('tr');
+            let csv = '';
+
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td, th');
+                const rowData = [];
+                cols.forEach((col, index) => {
+                    if (index < cols.length - 1) { // Exclude actions column
+                        rowData.push(col.textContent.trim());
+                    }
+                });
+                csv += rowData.join(',') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${type}_data.csv`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Real-time updates simulation
+        function simulateRealTimeUpdates() {
+            setInterval(() => {
+                // Update random statistics
+                const statNumbers = document.querySelectorAll('.stat-number');
+                statNumbers.forEach(stat => {
+                    const currentValue = parseInt(stat.textContent.replace(/,/g, ''));
+                    const change = Math.floor(Math.random() * 10) - 5;
+                    const newValue = Math.max(0, currentValue + change);
+                    stat.textContent = newValue.toLocaleString();
+                });
+            }, 30000); // Update every 30 seconds
+        }
+
+        // Initialize real-time updates
+        simulateRealTimeUpdates();
+
+        // Mobile responsive enhancements
+        function handleMobileView() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.main-content');
+
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('collapsed');
+                mainContent.style.marginLeft = '0';
+            }
+        }
+
+        window.addEventListener('resize', handleMobileView);
+        handleMobileView();
+
+        // Add CSS animation for ripple effect
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                to {
+                    transform: scale(2);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>="Enter monthly rent">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Address</label>
+                    <textarea class="form-control" rows="3" placeholder="Enter full address"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Add Room</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="groceryModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('groceryModal')">&times;</span>
+            <h2>Add Grocery Order</h2>
+            <form>
+                <div class="form-group">
+                    <label class="form-label">Customer Name</label>
+                    <input type="text" class="form-control" placeholder="Enter customer name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Items</label>
+                    <textarea class="form-control" rows="3" placeholder="Enter items separated by commas"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Total Amount</label>
+                    <input type="number" class="form-control" placeholder

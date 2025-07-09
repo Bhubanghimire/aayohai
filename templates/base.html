@@ -1,0 +1,125 @@
+<!doctype html>
+{% load static %}
+<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark"
+data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-layout-style="default"
+data-layout-mode="light" data-layout-width="fluid" data-layout-position="fixed">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aayohai website">
+  <meta name="author" content="NSDeVil">
+  <title>AayoHai </title>
+  <!-- Script to change the sidebar menu collpse on page load -->
+  <script>
+    var html = document.documentElement;
+     // set Default Language
+	  var language = '{{language}}';
+    var collapseMenu = localStorage.getItem("collapseMenu");
+    var themeMode = localStorage.getItem("themeMode");
+    var pageTitleBlock = `{% block title %}{% endblock %}`;
+    document.title = "AayoHai | "+ pageTitleBlock;
+    if (themeMode == "dark"){
+      html.setAttribute("data-layout-mode", "dark");
+    }
+
+    if (collapseMenu == "YES"){
+        html.setAttribute("data-sidebar-size", "sm");
+        document.addEventListener("DOMContentLoaded", function() {
+          let parent = document.getElementById("topnav-hamburger-icon");
+          let child = parent.getElementsByClassName("hamburger-icon")[0];
+          child.classList.add("open");
+        });
+    }
+  </script>
+  <!-- Favicon Icon -->
+  <link rel="shortcut icon" href="{% static 'images/favicon.png' %}">
+
+  <!-- Stylesheets -->
+    <!-- Layout config Js -->
+    <script src="{% static 'assets/js/layout.js' %}"></script>
+    <!-- Bootstrap Css -->
+    <link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet" type="text/css" />
+
+    <!-- Icons Css -->
+    <link href="{% static 'assets/css/icons.min.css' %}" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="{% static 'assets/css/app.min.css' %}" rel="stylesheet" type="text/css" />
+    <!-- custom Css-->
+    <link href="{% static 'assets/css/custom.min.css' %}" rel="stylesheet" type="text/css" />
+    {% block stylesheet %}{% endblock stylesheet %}
+
+    <style>
+      div.dataTables_scrollBody {
+          border: none !important;
+      }
+    </style>
+
+</head>
+
+<body>
+   <!-- Begin page -->
+  <div id="layout-wrapper">
+  {% include 'components/topbar.html' %}
+  {% block sidebar %}{% endblock sidebar %}
+    <div class="main-content">
+      <div class="page-content">
+          <div class="container-fluid">
+            <!-- start page title and breadcrumb -->
+            <div class="row">
+              <div class="col-12">
+                  <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                      <h4 class="mb-sm-0" id="breadcrumb_pageTitle"></h4>
+                      <div class="page-title-right">
+                          <ol class="breadcrumb m-0">
+                              {% block breadcrumb %}{% endblock %}
+                          </ol>
+                      </div>
+                  </div>
+              </div>
+            </div><!-- end page title and breadcrumb-->
+
+             <div class="container">
+              {% block content %}{% endblock %} <!-- page content is here-->
+              </div>
+
+          </div><!-- container-fluid -->
+      </div><!-- End Page-content -->
+      {% include 'components/footer.html' %}
+    </div><!-- end main content-->
+  </div><!-- END layout-wrapper -->
+  <!-- Body End -->
+
+
+    <script src="{% static 'assets/js/jquery-3.6.3.min.js' %}"></script>
+    <!-- JAVASCRIPT -->
+    <script src="{% static 'assets/libs/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'assets/libs/simplebar/simplebar.min.js' %}"></script>
+    <script src="{% static 'assets/libs/node-waves/waves.min.js' %}"></script>
+    <script src="{% static 'assets/libs/feather-icons/feather.min.js' %}"></script>
+    <!-- <script src="{% static 'assets/js/pages/plugins/lord-icon-2.1.0.js' %}"></script> -->
+    <!-- <script src="{% static 'assets/js/plugins.js' %}"></script> -->
+    <!-- App js -->
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script src="{% static 'assets/js/notification.js' %}"></script>
+
+
+
+    <script>
+      //set active menu
+      function set_active_menu(mainmenu, submenu){
+        let act_menu = $("a[data-menu_id='"+mainmenu+"']");
+        act_menu.addClass("active");
+        if (submenu != 'none'){
+          act_menu.attr("aria-expanded", "true");
+          let act_submenu = $("a[data-menu_id='"+submenu+"']");
+          act_submenu.addClass("active");
+          act_submenu.closest(".collapse.menu-dropdown").addClass('show');
+        }
+      }
+    </script>
+    {% block javascript %}{% endblock %}
+    <script src="{% static 'assets/js/custom.js' %}"></script>
+    <script src="{% static 'assets/js/toBeDeletedAfterMerge.js' %}"></script>
+  </body>
+</html>
