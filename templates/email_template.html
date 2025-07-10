@@ -1,41 +1,56 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your OTP Verification Code</title>
+</head>
+<body style="margin:0; padding:0; background-color:#f2f2f2; font-family: 'Open Sans', sans-serif;">
 
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f2f2f2; padding: 30px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding: 40px 30px; text-align: center; border-top: 5px solid #000000;">
+              <h1 style="margin: 0; font-size: 28px; color: #333333; font-weight: 600;">
+                Your OTP Verification Code
+              </h1>
+            </td>
+          </tr>
 
-<body style="background-color:#e2e1e0;font-family: Open Sans, sans-serif;font-size:100%;font-weight:400;line-height:1.4;color:#000;">
-  <table style="max-width:670px;margin:50px auto 10px;background-color:#fff;padding:50px;-webkit-border-radius:3px;-moz-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);-moz-box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24);box-shadow:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.24); border-top: solid 10px black;">
-    <thead>
-      <tr>
-        <th style="text-align:left;">Your OTP Verification Code</th>
+          <tr>
+            <td style="padding: 20px 30px; text-align: center;">
+              <p style="font-size: 16px; color: #555555; margin: 0 0 20px;">
+                Use the following code to verify your account:
+              </p>
 
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="height:35px;"></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="border: solid 1px #ddd; padding:10px 20px;">
-          <p style="font-size:25px;margin:0 0 15px 0;"><span style="font-weight:bold;display:inline-block;min-width:150px">OTP:</span><b style="color:green;font-weight:normal;margin:0">{{ content }}</b></p>
+              <div style="display: inline-block; background-color: #28a745; color: #ffffff; padding: 15px 30px; font-size: 24px; font-weight: bold; letter-spacing: 2px; border-radius: 4px;">
+                {{ content }}
+              </div>
 
-        </td>
-      </tr>
+              <p style="font-size: 14px; color: #999999; margin-top: 20px;">
+                This code will expire in 10 minutes for your security.
+              </p>
+            </td>
+          </tr>
 
+          <tr>
+            <td style="padding: 30px; font-size: 14px; color: #777777; text-align: center;">
+              <p style="margin: 0;">
+                Regards,<br/>
+                <strong>Aayo Hai</strong><br/>
+                {{location}}<br/><br/>
+                <b>Phone:</b> {{phone}}<br/>
+                <b>website:</b> <a href="https//www.aayohai.com">aayohai.com</a>
+              </p>
+            </td>
+          </tr>
 
-      </tr>
-
-
-      </tr>
-    </tbody>
-    <tfooter>
-      <tr>
-        <td colspan="2" style="font-size:14px;padding:50px 15px 0 15px;">
-          <strong style="display:block;margin:0 0 10px 0;">Regards</strong> aayo hai<br> Kathmandu, Nepal<br><br>
-          <b>Phone:</b> 987462361<br>
-          <b>Email:</b> example@gmail.com
-        </td>
-      </tr>
-    </tfooter>
+        </table>
+      </td>
+    </tr>
   </table>
-</body>
 
+</body>
 </html>
