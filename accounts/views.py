@@ -124,14 +124,12 @@ class AuthViewSet(viewsets.ViewSet):
         email = data['email']
         generated_otp = generate_otp()
         check_status = OTP.objects.filter(email=email)
-        print("status", check_status)
+        about = About.objects.first()
         if check_status.exists():
             check_status.update(otp=generated_otp)
-            print("updated", check_status)
         else:
             obj = OTP.objects.create(email=email, otp=generated_otp)
-            print("obj created", obj)
-        context = {'title': 'Otp', 'content': generated_otp}
+        context = {'title': 'Otp', 'content': generated_otp,'location':about.address if about else "Australia", 'phone': about.phone if about else "1234567890"}
         html_content = render_to_string("email_template.html", context=context)
         text_content = strip_tags(html_content)
         email = EmailMultiAlternatives('Otp for email verification', text_content, settings.DEFAULT_FROM_EMAIL, [email])
