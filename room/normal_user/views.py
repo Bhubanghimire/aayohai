@@ -74,6 +74,9 @@ class RoomViewSet(viewsets.ModelViewSet):
     # permission_classes = [AllowAny]
 
     def get_queryset(self):
+        added_by_me=self.request.query_params.get("added_by_me",False)
+        if added_by_me:
+            return super().get_queryset().filter(added_by=self.request.user.id)
         queryset = super().get_queryset().exclude(status_id=18)
         return queryset
 
@@ -124,6 +127,84 @@ class RoomViewSet(viewsets.ModelViewSet):
 
         serializer = self.serializer_class(room)
         return Response(serializer.data)
+
+    def update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        data = request.data
+        request.data._mutable = True
+        images = request.FILES.getlist('image')
+
+        # Parse amenities if passed as JSON string
+        if isinstance(data.get('amenities'), str):
+            data['amenities'] = json.loads(data['amenities'])
+            instance.amenities.clear()
+
+        # Handle location update
+        if data.get('location'):
+            location_data = json.loads(data.get('location'))
+            state = State.objects.get_or_create(
+                country=location_data['country'],
+                name=location_data['state']
+            )[0]
+            location_data.pop('state')
+            location_data.pop('country')
+
+            # Update the existing Location or create new one
+            if instance.location:
+                for key, value in location_data.items():
+                    setattr(instance.location, key, value)
+                instance.location.state = state
+                instance.location.save()
+                location_id = instance.location.id
+            else:
+                location = Location.objects.create(state=state, **location_data)
+                location_id = location.id
+
+            data['location'] = location_id
+
+        # Ensure added_by remains same or assign if missing
+        data['added_by'] = getattr(instance, 'added_by_id', request.user.id)
+
+        # Status fallback if not provided
+        # if not data.get('status'):
+        #     data['status'] = 16
+
+        request.data._mutable = False
+
+        serializer = RoomCreateSerializer(instance, data=data, partial=True)
+        if serializer.is_valid():
+            try:
+                with transaction.atomic():
+                    room = serializer.save()
+
+                    # Update amenities
+                    if 'amenities' in data:
+
+                        room.amenities.set(data['amenities'])
+
+                    # Add new images if provided
+                    for image in images:
+                        Gallery.objects.create(room=room, image=image)
+
+                return JsonResponse(
+                    {"data": RoomDetailSerializer(room).data, "message": "Room updated successfully."},
+                    status=status.HTTP_200_OK
+                )
+            except Exception as e:
+                print("Error while updating room:", str(e))
+                return JsonResponse({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            print("Validation errors:", serializer.errors)
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True, url_path='status-update')
+    def status_update(self, request, pk=None):
+        room = self.get_object()
+        status_id = request.data.get('status_id')
+        room.status_id = status_id
+        room.save()
+
+        return Response({"message": "Status updated successfully."}, status=status.HTTP_200_OK)
 
 
 class RoomSearchViewSet(viewsets.ModelViewSet):
