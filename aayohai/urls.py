@@ -30,6 +30,7 @@ from grocery.normal_user.urls import grocery_router
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
     path("", include('webapp.urls')),
     path("api/", include((account_router.urls, 'accounts'), namespace='accounts')),
     path("api/type/", include((choice_router.urls, 'system'), namespace='system')),

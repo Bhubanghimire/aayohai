@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import environ
 import os
+from .dj_admin import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -36,6 +37,7 @@ CSRF_TRUSTED_ORIGINS = ["https://api.aayohai.com", "https://aayohai.com", "https
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'daphne',
     'channels',
     "django.contrib.admin",
@@ -130,6 +132,9 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
+
+JAZZMIN_SETTINGS = jazz_settings
+JAZZMIN_UI_TWEAKS = jazz_ui_tweaks
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
