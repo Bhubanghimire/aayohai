@@ -14,7 +14,7 @@ class AmenitiesSerializer(serializers.ModelSerializer):
 class GallerySerializer(serializers.ModelSerializer):
     class Meta:
         model = Gallery
-        fields = ['image']
+        fields = ["id",'image']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -113,3 +113,9 @@ class RoomCreateSerializer(serializers.ModelSerializer):
         model = Room
         # fields = '__all__'
         exclude = ['amenities']
+
+# class RoomReviewSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Review
+#         fields = ['id', 'room', 'user', 'rating', 'review', 'created_at', 'updated_at']
+#         read_only_fields = ['id', 'user', 'room', 'created_at', 'updated_at']
