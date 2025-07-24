@@ -1,15 +1,15 @@
 jazz_settings = {
     # title of the window (Will default to current_admin_site.site_title if absent or None)
-    "site_title": "UBLCloud SuperAdmin",
+    "site_title": "AayoHai SuperAdmin",
 
     # Title on the login screen (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_header": "UBLCloud Admin",
+    "site_header": "AayoHai Admin",
 
     # Title on the brand (19 chars max) (defaults to current_admin_site.site_header if absent or None)
-    "site_brand": "UBLCloud Admin",
+    "site_brand": "AayoHai Admin",
 
     # Logo to use for your site, must be present in static files, used for brand on top left
-    "site_logo": "images/logo/ubl-logo-sm-blue.png",
+    "site_logo": "images/logo/aayohai_logo.png",
 
     # Logo to use for your site, must be present in static files, used for login form logo (defaults to site_logo)
     "login_logo": None,
@@ -24,7 +24,7 @@ jazz_settings = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Welcome to the UBLCloud SuperAdmin",
+    "welcome_sign": "Welcome to the AayoHai SuperAdmin",
 
     # Copyright on the footer
     "copyright": "NSDevil",
