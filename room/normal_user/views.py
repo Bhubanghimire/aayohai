@@ -207,7 +207,7 @@ class RoomViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=True, url_path='review')
     def review(self, request, pk=None):
-        room = self.get_object()
+        room = Room.objects.get(id=pk)
         user = request.user
         post_data = request.data
         post_data['user'] = user.id
