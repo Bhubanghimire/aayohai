@@ -77,8 +77,8 @@ class RoomViewSet(viewsets.ModelViewSet):
         added_by_me = self.request.query_params.get("added_by_me", False)
         if added_by_me:
             return super().get_queryset().filter(added_by=self.request.user.id)
-        queryset = super().get_queryset().exclude(status_id=18)
-        return queryset
+        # queryset = super().get_queryset().exclude(status_id=18)
+        return super().get_queryset()
 
     def create(self, request, *args, **kwargs):
         data = request.data
