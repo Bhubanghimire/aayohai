@@ -29,9 +29,9 @@ from django.contrib.auth import get_user_model
 from tutorial.quickstart.serializers import UserSerializer
 
 from aayohai.settings import HOST_URL
-from room.models import Room, State, Location, Gallery, Amenities
+from room.models import Room, State, Location, Gallery, Amenities, Review
 from room.serializers import RoomSerializers, StateSerializer, RoomDetailSerializer, RoomSearchSerializer, \
-    RoomCreateSerializer, AmenitiesSerializer
+    RoomCreateSerializer, AmenitiesSerializer, ReviewSerializer
 from system.serializers import ConfigChoiceSerializer
 from accounts.models import User
 
@@ -74,11 +74,11 @@ class RoomViewSet(viewsets.ModelViewSet):
     # permission_classes = [AllowAny]
 
     def get_queryset(self):
-        added_by_me=self.request.query_params.get("added_by_me",False)
+        added_by_me = self.request.query_params.get("added_by_me", False)
         if added_by_me:
             return super().get_queryset().filter(added_by=self.request.user.id)
-        queryset = super().get_queryset().exclude(status_id=18)
-        return queryset
+        # queryset = super().get_queryset().exclude(status_id=18)
+        return super().get_queryset()
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -179,7 +179,6 @@ class RoomViewSet(viewsets.ModelViewSet):
 
                     # Update amenities
                     if 'amenities' in data:
-
                         room.amenities.set(data['amenities'])
 
                     # Add new images if provided
@@ -205,6 +204,45 @@ class RoomViewSet(viewsets.ModelViewSet):
         room.save()
 
         return Response({"message": "Status updated successfully."}, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True, url_path='review')
+    def review(self, request, pk=None):
+        room = Room.objects.get(id=pk)
+        user = request.user
+        post_data = request.data
+        post_data['user'] = user.id
+
+        # Check if the user has already reviewed this room
+        try:
+            review_instance = Review.objects.get(room=room, user=user)
+            # Update existing review
+            serializer = ReviewSerializer(review_instance, data=request.data, context={'request': request})
+        except Review.DoesNotExist:
+            # Create a new review
+            serializer = ReviewSerializer(data=post_data, context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save(user=user, room=room)
+            response = {
+                "message": "Review submitted successfully.",
+                "data": serializer.data
+            }
+            return Response(response, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True, url_path='image-delete')
+    def image_delete(self, request, pk=None):
+        room = self.get_object()
+        image_id = request.data.get('image_id')
+        user = request.user
+
+        try:
+            image = Gallery.objects.get(room=room,room__added_by=user, id=image_id)
+            image.delete()
+            return Response({"message": "Image deleted successfully."}, status=status.HTTP_200_OK)
+        except Gallery.DoesNotExist:
+            return Response({"message": "Image not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
 class RoomSearchViewSet(viewsets.ModelViewSet):
