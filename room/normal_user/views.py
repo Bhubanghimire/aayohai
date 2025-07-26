@@ -223,7 +223,11 @@ class RoomViewSet(viewsets.ModelViewSet):
 
         if serializer.is_valid():
             serializer.save(user=user, room=room)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            response = {
+                "message": "Review submitted successfully.",
+                "data": serializer.data
+            }
+            return Response(response, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

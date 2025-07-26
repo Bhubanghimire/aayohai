@@ -79,14 +79,16 @@ class RoomSerializers(serializers.ModelSerializer):
 class RoomDetailSerializer(RoomSerializers):
     reviews = serializers.SerializerMethodField()
     gallery = serializers.SerializerMethodField()
+    # furnishing = serializers.SerializerMethodField()
 
     class Meta:
         model = Room
-        fields = ['id', 'name', 'description', 'amenities', 'rule', 'length', 'breadth', 'price','inspection_price', 'review', 'reviews', 'gallery']
+        fields = ['id', 'name', 'description','furnishing', 'amenities', 'rule', 'length', 'breadth', 'price','inspection_price', 'review', 'reviews', 'gallery']
 
     def to_representation(self, instance):
         self.fields['state'] = StateSerializer(read_only=True)
         self.fields['amenities'] = AmenitiesSerializer(many=True, read_only=True)
+        self.fields['furnishing'] = ConfigChoiceSerializer(instance.furnishing, read_only=True)
         return super(RoomDetailSerializer, self).to_representation(instance)
 
     def get_gallery(self, obj):
