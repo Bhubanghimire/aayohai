@@ -114,8 +114,11 @@ class About(models.Model):
 
 class Conversation(models.Model):
     admin = models.ForeignKey(User, related_name='admin_conversations', on_delete=models.CASCADE)
-    worker = models.ForeignKey(User, related_name='user_conversations', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='user_conversations', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('admin', 'user')
 
 
 class Message(models.Model):

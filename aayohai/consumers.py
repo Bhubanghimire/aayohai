@@ -7,7 +7,25 @@ from django.conf import settings
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.contrib.auth.models import AnonymousUser
 
+from accounts.models import Conversation, User, Message
+
 online_users = dict()
+
+# chat/utils.py
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
+def notify_admin_new_message(admin_id, conversation_id, message, sender_id):
+    channel_layer = get_channel_layer()
+    async_to_sync(channel_layer.group_send)(
+        f"admin_notify_{admin_id}",
+        {
+            "type": "admin.message",
+            "conversation_id": conversation_id,
+            "message": message,
+            "sender_id": sender_id,
+        }
+    )
 
 # Serialization of django queryset
 def messages_to_json(messages):
@@ -157,3 +175,91 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # if 'message_link_type' in event:
         #     chatdata['message_link_type'] = event['message_link_type']
         await self.send(text_data=json.dumps(chatdata))
+
+#
+# from channels.generic.websocket import AsyncWebsocketConsumer
+# import json
+from channels.db import database_sync_to_async
+# from .models import Message, Conversation
+# from users.models import User
+class ChatConsumerNew(AsyncWebsocketConsumer):
+    async def connect(self):
+        self.conversation_id = self.scope['url_route']['kwargs']['room_name']
+        self.room_group_name = f'chat_{self.conversation_id}'
+
+        await self.channel_layer.group_add(
+            self.room_group_name, self.channel_name
+        )
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        message = data['message']
+        sender_id = data['sender_id']
+
+        await self.save_message(self.conversation_id, sender_id, message)
+
+        conversation = Conversation.objects.get(id=self.conversation_id)
+        message_text = message
+        if self.scope["user"].user_type.name == "worker":
+            notify_admin_new_message(
+                admin_id=conversation.admin.id,
+                conversation_id=conversation.id,
+                message=message_text,
+                sender_id=self.scope["user"].id
+            )
+
+        await self.channel_layer.group_send(
+            self.room_group_name,
+            {
+                'type': 'chat_message',
+                'message': message,
+                'sender_id': sender_id,
+            }
+        )
+
+    async def chat_message(self, event):
+        await self.send(text_data=json.dumps(event))
+
+    @database_sync_to_async
+    def save_message(self, conversation_id, sender_id, message):
+        conversation = Conversation.objects.get(id=conversation_id)
+        sender = User.objects.get(id=sender_id)
+        return Message.objects.create(conversation=conversation, sender=sender, content=message)
+
+
+# admin/consumers.py
+
+class AdminNotifyConsumer(AsyncWebsocketConsumer):
+    async def connect(self):
+        user = self.scope['user']
+
+        if not user.is_authenticated:
+            print("❌ WebSocket rejected: unauthenticated user")
+            await self.close()
+            return
+
+        if getattr(user, "user_type", None) is None or user.user_type.id != 1:
+            print(f"❌ WebSocket rejected: user {user} is not admin")
+            await self.close()
+            return
+
+        self.group_name = f"admin_notify_{user.id}"
+        await self.channel_layer.group_add(self.group_name, self.channel_name)
+        print(f"✅ WebSocket connected for admin_notify_{user.id}")
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        if hasattr(self, "group_name"):
+            await self.channel_layer.group_discard(self.group_name, self.channel_name)
+        else:
+            print("Disconnect without group name")
+
+    async def admin_message(self, event):
+        await self.send(text_data=json.dumps({
+            "conversation_id": event["conversation_id"],
+            "message": event["message"]
+        }))

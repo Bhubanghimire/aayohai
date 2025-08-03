@@ -31,7 +31,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from accounts.middleware import generate_access_token, generate_refresh_token, generate_otp
-from accounts.models import OTP, Advertise, About
+from accounts.models import OTP, Advertise, About, Conversation
 from accounts.serializers import UserSerializers, AdvertiseSerializer, UserUpdateSerializer, FCMDeviceSerializer, \
     UserDetailSerializers
 from events.models import Event
@@ -426,6 +426,26 @@ class ChatViewSet(viewsets.ViewSet):
             # 'some_id': some_id,
             'message': 'Data Fetched with arg.'
         })
+
+    @action(detail=False, methods=['GET'], url_path='conversation')
+    def conversation(self,request):
+        self_user = request.user
+        # self_admin = self.request.GET.get('self_admin')
+        user_id = self.request.GET.get('user_id')
+
+        if self_user.user_type.id == 1:
+            admin =self_user.id
+            user=user_id
+
+        elif self_user.user_type.id == 2 or self_user.user_type is None:
+            admin =User.objects.filter(user_type_id=1).first().id
+            user = self_user.id
+
+        else:
+            admin = user_id
+            user=self_user.id
+        conv, created = Conversation.objects.get_or_create(admin_id=admin, user_id=user)
+        return Response({"conversation_id": conv.id})
 
 #
 # class GlobalSearchViewSet(viewsets.ViewSet):
