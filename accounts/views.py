@@ -2,6 +2,9 @@ import json
 import os
 from datetime import datetime, timedelta
 
+from django.db.models import Q
+from fcm_django.models import FCMDevice
+
 from django.contrib.auth.hashers import check_password
 from django.core.mail import EmailMultiAlternatives
 from django.http import JsonResponse
@@ -29,11 +32,14 @@ from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from accounts.middleware import generate_access_token, generate_refresh_token, generate_otp
 from accounts.models import OTP, Advertise, About
-from accounts.serializers import UserSerializers, AdvertiseSerializer, UserUpdateSerializer
+from accounts.serializers import UserSerializers, AdvertiseSerializer, UserUpdateSerializer, FCMDeviceSerializer, \
+    UserDetailSerializers
+from events.models import Event
+from events.serializers import EventSerializers
 from grocery.models import Grocery
 from grocery.serializers import GrocerySerializers
 from room.models import Room
-from room.serializers import RoomSerializers
+from room.serializers import RoomSerializers, RoomSearchSerializer
 
 # from accounts.models import OTP
 # from .serializers import UserSerializers
@@ -131,9 +137,9 @@ class AuthViewSet(viewsets.ViewSet):
             obj = OTP.objects.create(email=email, otp=generated_otp)
         context = {'title': 'Otp',
                    'content': generated_otp,
-                   'location':about.address if about else "Australia",
+                   'location': about.address if about else "Australia",
                    'phone': about.phone if about else "1234567890",
-                   "logo":about.logo.url if about else ""
+                   "logo": about.logo.url if about else ""
 
                    }
         html_content = render_to_string("email_template.html", context=context)
@@ -231,16 +237,62 @@ class MainViewSet(viewsets.ViewSet):
     @action(detail=False, methods=['GET'], url_path='new-arrival')
     def new_arrival(self, request):
         # seven_days_ago = datetime.now() - timedelta(days=7)
-        ad_list = Room.objects.all().order_by("-id")[0:5]    #filter(created_at__gte=seven_days_ago)
+        ad_list = Room.objects.all().order_by("-id")[0:5]  #filter(created_at__gte=seven_days_ago)
         serializer = RoomSerializers(ad_list, context={"request": request}, many=True).data
         return Response({'data': serializer, 'message': 'Data Fetched.'})
 
     @action(detail=False, methods=['GET'], url_path='groceries')
     def groceries(self, request):
         seven_days_ago = datetime.now() - timedelta(days=7)
-        grocery_list = Grocery.objects.all().order_by("-id")[0:5]   #filter(created_at__gte=seven_days_ago)
+        grocery_list = Grocery.objects.all().order_by("-id")[0:5]  #filter(created_at__gte=seven_days_ago)
         serializer = GrocerySerializers(grocery_list, context={"request": request}, many=True).data
         return Response({'data': serializer, 'message': 'Data Fetched.'})
+
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        query = request.query_params.get('search', '').strip()
+
+        if not query:
+            return Response({
+                'rooms': [],
+                'events': [],
+                'groceries': [],
+                'message': 'No search query provided.'
+            })
+
+        keywords = query.split()
+
+        # Helper function to build Q object for each model
+        def build_orm(field_name='name'):
+            q_obj = Q()
+            for keyword in keywords:
+                q_obj &= Q(**{f"{field_name}__icontains": keyword})
+            return q_obj
+
+
+
+        # def build_grocery(field_name='name'):
+        #     q_obj = Q()
+        #     for keyword in keywords:
+        #         q_obj &= Q(**{f"{field_name}__icontains": keyword})
+        #     return q_obj
+
+        # Apply filtering using all keywords (AND search)
+        room_qs = Room.objects.filter(build_orm('name'))
+        event_qs = Event.objects.filter(build_orm('title'))
+        grocery_qs = Grocery.objects.filter(build_orm('name'))
+
+        # Serialize the queryset
+        room_list = RoomSearchSerializer(room_qs, many=True).data
+        event_list = EventSerializers(event_qs, many=True).data
+        grocery_list = GrocerySerializers(grocery_qs, many=True).data
+
+        return Response({
+            'rooms': room_list,
+            'events': event_list,
+            'groceries': grocery_list,
+            'message': 'Data fetched successfully.'
+        })
 
 
 class ProfileViewSet(viewsets.ViewSet):
@@ -274,7 +326,6 @@ class ProfileViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             serializer.save()
 
-
             return Response({'data': serializer.data, 'message': 'Data updated.'})
         else:
             return Response({'data': serializer.errors, 'message': 'Data update failed.'})
@@ -304,6 +355,48 @@ class ProfileViewSet(viewsets.ViewSet):
     #     # Not using pk, returning the authenticated user
 
 
+class FCMDeviceViewSet(viewsets.ModelViewSet):
+    queryset = FCMDevice.objects.all()
+    serializer_class = FCMDeviceSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            existing_record = FCMDevice.objects.filter(user=request.user.id,
+                                                       registration_id=request.data['registration_id']).first()
+            print(existing_record)
+        except KeyError:
+            return Response({"message": "send required keyword"}, status=400)
+
+        if existing_record:
+            serializer = self.get_serializer(existing_record, data=request.data)
+        else:
+            serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def list(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def retrieve(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def put(self, request, *args, **kwargs):
+        FCMDevice.objects.filter(user=self.request.user).update(active=False)
+        return Response(status=status.HTTP_200_OK)
+
+    def partial_update(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def destroy(self, request, *args, **kwargs):
+        return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+
 class ChatViewSet(viewsets.ViewSet):
     permission_classes = [IsAuthenticated]
 
@@ -311,7 +404,6 @@ class ChatViewSet(viewsets.ViewSet):
     def history(self, request, room_id=None):
 
         chat_url = os.path.join(settings.MEDIA_ROOT, 'chat_log', f'chat_{room_id}')
-
 
         def extract_datetime(filename):
             # Remove extension
@@ -334,3 +426,8 @@ class ChatViewSet(viewsets.ViewSet):
             # 'some_id': some_id,
             'message': 'Data Fetched with arg.'
         })
+
+#
+# class GlobalSearchViewSet(viewsets.ViewSet):
+#     permission_classes = [AllowAny]
+

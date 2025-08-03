@@ -1,6 +1,7 @@
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from fcm_django.models import FCMDevice
 
 from accounts.models import Advertise
 
@@ -44,3 +45,9 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["first_name", "last_name", 'birth_date', 'gender']
+
+
+class FCMDeviceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FCMDevice
+        fields = "__all__"

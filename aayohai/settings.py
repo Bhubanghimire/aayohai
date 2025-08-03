@@ -13,6 +13,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from pathlib import Path
 import environ
 import os
+import json
+# import firebase_admin
+# from firebase_admin import credentials
 from .dj_admin import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,6 +49,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "fcm_django",
+
 
     "rest_framework",
 
@@ -156,7 +161,15 @@ STATICFILES_DIRS = [
 ]
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
+# FCM_DJANGO_SETTINGS = {
+#     "FCM_SERVER_KEY": env('FCM_SERVER_KEY')
+# }
+# firebase_credentials_json = env('FIREBASE_CREDENTIALS_JSON')
+# cred_dict = json.loads(firebase_credentials_json)
 
+# # Initialize Firebase with dict instead of file
+# cred = credentials.Certificate(cred_dict)
+# firebase_admin.initialize_app(cred)
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
