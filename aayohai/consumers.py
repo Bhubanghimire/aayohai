@@ -198,7 +198,7 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         message = data['message']
-        sender_id = data['sender_id']
+        sender_id = self.scope["user"].id
 
         await self.save_message(self.conversation_id, sender_id, message)
 

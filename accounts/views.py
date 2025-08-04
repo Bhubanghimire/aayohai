@@ -31,9 +31,9 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.contrib.auth import get_user_model
 from accounts.middleware import generate_access_token, generate_refresh_token, generate_otp
-from accounts.models import OTP, Advertise, About, Conversation
+from accounts.models import OTP, Advertise, About, Conversation, Message
 from accounts.serializers import UserSerializers, AdvertiseSerializer, UserUpdateSerializer, FCMDeviceSerializer, \
-    UserDetailSerializers
+    UserDetailSerializers, MessageSerializer
 from events.models import Event
 from events.serializers import EventSerializers
 from grocery.models import Grocery
@@ -269,8 +269,6 @@ class MainViewSet(viewsets.ViewSet):
                 q_obj &= Q(**{f"{field_name}__icontains": keyword})
             return q_obj
 
-
-
         # def build_grocery(field_name='name'):
         #     q_obj = Q()
         #     for keyword in keywords:
@@ -402,52 +400,41 @@ class ChatViewSet(viewsets.ViewSet):
 
     @action(detail=False, url_path='(?P<room_id>[^/.]+)/history')
     def history(self, request, room_id=None):
-
-        chat_url = os.path.join(settings.MEDIA_ROOT, 'chat_log', f'chat_{room_id}')
-
-        def extract_datetime(filename):
-            # Remove extension
-            name_part = filename.replace('.txt', '')
-            # Parse to datetime
-            dt = datetime.strptime(name_part, "%Y-%m-%d-%H-%M-%S-%f")
-            return dt
-
-        if os.path.exists(chat_url):
-            chat_list = os.listdir(chat_url)
-            sorted_files = sorted(
-                chat_list,
-                key=extract_datetime
-            )
-        else:
-            sorted_files = []
+        message = Message.objects.filter(conversation_id=room_id).order_by('-timestamp')
+        message_serializer = MessageSerializer(message, many=True)
 
         return Response({
-            'data': sorted_files,
-            # 'some_id': some_id,
+            'data': message_serializer.data,
             'message': 'Data Fetched with arg.'
         })
 
     @action(detail=False, methods=['GET'], url_path='conversation')
-    def conversation(self,request):
+    def conversation(self, request):
         self_user = request.user
         # self_admin = self.request.GET.get('self_admin')
         user_id = self.request.GET.get('user_id')
 
         if self_user.user_type.id == 1:
-            admin =self_user.id
-            user=user_id
+            if not user_id:
+                return Response({"message": "user_id is required"}, status=400)
+            admin = self_user.id
+            user = user_id
 
         elif self_user.user_type.id == 2 or self_user.user_type is None:
-            admin =User.objects.filter(user_type_id=1).first().id
+            admin = User.objects.filter(user_type_id=1).first().id
             user = self_user.id
 
         else:
             admin = user_id
-            user=self_user.id
+            user = self_user.id
         conv, created = Conversation.objects.get_or_create(admin_id=admin, user_id=user)
         return Response({"conversation_id": conv.id})
 
-#
-# class GlobalSearchViewSet(viewsets.ViewSet):
-#     permission_classes = [AllowAny]
+    @action(detail=False, methods=['GET'], url_path='user_list')
+    def user_list(self, request):
+        user_ids = Conversation.objects.filter(admin=request.user.id).values_list('user_id', flat=True)
+        user_list = User.objects.filter(id__in=user_ids)
+        user_serializer = UserDetailSerializers(user_list, many=True)
+        return Response({"data": user_serializer.data, "message": "Notification sent."})
+
 
