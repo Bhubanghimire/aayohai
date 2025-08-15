@@ -228,9 +228,9 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
     def save_message(self, conversation_id, sender_id, message):
         conversation = Conversation.objects.get(id=conversation_id)
         sender = User.objects.filter(id=sender_id).first()
-        if sender is None:
-            sender = User.objects.first()
-        print(sender_id)
+        # if sender is None:
+        #     sender = User.objects.first()
+        # print(sender_id)
         return Message.objects.create(conversation=conversation, sender=sender, content=message)
 
 
