@@ -197,7 +197,7 @@ class StripeSession(viewsets.ModelViewSet):
 
         if event_items.exists():
             event_ids = event_items.values_list('event_id', flat=True)
-            Event.objects.filter(id__in=event_ids).update(status_id=20)
+            Event.objects.filter(id__in=event_ids)
             event = event_items.first().event
             for event_rate in event_items:
                 price = event_rate.event_price
