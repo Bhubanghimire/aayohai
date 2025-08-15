@@ -199,18 +199,18 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
         data = json.loads(text_data)
         message = data['message']
         sender_id = self.scope["user"].id
-
+        print(sender_id)
         await self.save_message(self.conversation_id, sender_id, message)
 
         conversation = Conversation.objects.get(id=self.conversation_id)
         message_text = message
-        if self.scope["user"].user_type.name == "worker":
-            notify_admin_new_message(
-                admin_id=conversation.admin.id,
-                conversation_id=conversation.id,
-                message=message_text,
-                sender_id=self.scope["user"].id
-            )
+        # if self.scope["user"].user_type.name == "worker":
+        #     notify_admin_new_message(
+        #         admin_id=conversation.admin.id,
+        #         conversation_id=conversation.id,
+        #         message=message_text,
+        #         sender_id=self.scope["user"].id
+        #     )
 
         await self.channel_layer.group_send(
             self.room_group_name,
@@ -227,7 +227,10 @@ class ChatConsumerNew(AsyncWebsocketConsumer):
     @database_sync_to_async
     def save_message(self, conversation_id, sender_id, message):
         conversation = Conversation.objects.get(id=conversation_id)
-        sender = User.objects.get(id=sender_id)
+        sender = User.objects.filter(id=sender_id).first()
+        if sender is None:
+            sender = User.objects.first()
+        print(sender_id)
         return Message.objects.create(conversation=conversation, sender=sender, content=message)
 
 

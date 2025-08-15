@@ -104,13 +104,15 @@ class AuthViewSet(viewsets.ViewSet):
             )
 
         # user = authenticate(request, email=email, password=password)
-        user = User.objects.get(email=email)
-        is_correct = check_password(password, user.password)
-        print(user, is_correct)
+        user = User.objects.filter(email=email).first()
         if user is None:
             raise serializers.ValidationError(
                 {"message": "A user with this email and password was not found."}
             )
+
+        is_correct = check_password(password, user.password)
+        print(user, is_correct)
+
 
         access_token = generate_access_token(user)
         refresh_token = generate_refresh_token(user)
